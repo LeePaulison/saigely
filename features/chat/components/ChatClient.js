@@ -4,32 +4,24 @@ import { useEffect, useRef, useState } from "react";
 
 import { getConversation } from "../api/getConversation";
 
-import ChatLayout from "./ChatLayout";
 import MessageList from "./MessageList";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
 
-export default function ChatClient() {
+export const ChatClient = ({
+  activeConversationId,
+  setActiveConversationId,
+}) => {
   const websocketRef = useRef(null);
-  const [activeConversationId, setActiveConversationId] = useState(null);
+  const [messages, setMessages] = useState([
+    {
+      id: crypto.randomUUID(),
+      role: "assistant",
+      content: "Welcome to Saigely.",
+    },
+  ]);
 
   console.log("ActiveConversationId: ", activeConversationId);
-
-  useEffect(() => {
-    if (!activeConversationId) {
-      return;
-    }
-
-    localStorage.setItem("activeConversationId", activeConversationId);
-  }, [activeConversationId]);
-
-  useEffect(() => {
-    const savedConversationId = localStorage.getItem("activeConversationId");
-
-    if (savedConversationId) {
-      setActiveConversationId(savedConversationId);
-    }
-  }, []);
 
   useEffect(() => {
     async function hydrateConversation() {
@@ -53,14 +45,6 @@ export default function ChatClient() {
 
     hydrateConversation();
   }, [activeConversationId]);
-
-  const [messages, setMessages] = useState([
-    {
-      id: crypto.randomUUID(),
-      role: "assistant",
-      content: "Welcome to Saigely.",
-    },
-  ]);
 
   useEffect(() => {
     const websocket = new WebSocket("ws://localhost:3000/ws");
@@ -138,7 +122,7 @@ export default function ChatClient() {
     );
   }
   return (
-    <ChatLayout>
+    <div className="flex flex-col w-full">
       <MessageList>
         {messages.map((message) => (
           <MessageBubble
@@ -150,6 +134,6 @@ export default function ChatClient() {
       </MessageList>
 
       <ChatInput onSendMessage={handleSendMessage} />
-    </ChatLayout>
+    </div>
   );
-}
+};
