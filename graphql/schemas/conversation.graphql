@@ -1,12 +1,3 @@
-type User {
-  name: String
-  email: String
-}
-
-type Query {
-  me: User
-}
-
 type Message {
   role: String
   content: String
