@@ -51,3 +51,39 @@ export async function appendMessages({ conversationId, messages }) {
     conversationId,
   };
 }
+
+export async function getConversationById(conversationId) {
+  const database = await getMongoDatabase();
+
+  const conversationsCollection = database.collection("conversations");
+
+  return conversationsCollection.findOne({
+    _id: new ObjectId(conversationId),
+  });
+}
+
+export async function getUserConversations(userId) {
+  const database = await getMongoDatabase();
+
+  const conversationsCollection = database.collection("conversations");
+
+  return conversationsCollection
+    .find(
+      {
+        userId,
+      },
+      {
+        projection: {
+          messages: {
+            $slice: -1,
+          },
+
+          updatedAt: 1,
+        },
+      },
+    )
+    .sort({
+      updatedAt: -1,
+    })
+    .toArray();
+}

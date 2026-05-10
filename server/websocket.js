@@ -2,8 +2,6 @@ import { WebSocketServer } from "ws";
 import { createChatStream } from "../lib/openai/chat.js";
 import { saveConversationTurn } from "./services/conversationService.js";
 
-import { openai } from "../lib/openai/client.js";
-
 export const websocketServer = new WebSocketServer({
   noServer: true,
 });

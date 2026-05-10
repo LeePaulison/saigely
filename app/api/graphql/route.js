@@ -1,39 +1,35 @@
 import { createYoga, createSchema } from "graphql-yoga";
-import { headers } from "next/headers";
+import { loadFilesSync } from "@graphql-tools/load-files";
+import { mergeTypeDefs } from "@graphql-tools/merge";
 
 import { auth } from "@/lib/auth/auth";
 
+import { conversationResolvers } from "@/graphql/resolvers/conversation";
+
+const typesArray = loadFilesSync("graphql/schemas/**/*.graphql");
+
+console.log(typesArray);
+
+const typeDefs = mergeTypeDefs(typesArray);
+
 const yoga = createYoga({
   schema: createSchema({
-    typeDefs: /* GraphQL */ `
-      type User {
-        name: String
-        email: String
-      }
+    typeDefs,
 
-      type Query {
-        me: User
-      }
-    `,
-
-    resolvers: {
-      Query: {
-        me: async (_, __, context) => {
-          return context.session?.user || null;
-        },
-      },
-    },
+    resolvers: conversationResolvers,
   }),
 
   graphqlEndpoint: "/api/graphql",
 
-  context: async () => {
+  context: async ({ request }) => {
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: request.headers,
     });
 
     return {
       session,
+      user: session?.user,
+      request,
     };
   },
 });

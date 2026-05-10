@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { getConversation } from "../api/getConversation";
+
 import ChatLayout from "./ChatLayout";
 import MessageList from "./MessageList";
 import MessageBubble from "./MessageBubble";
@@ -10,6 +12,47 @@ import ChatInput from "./ChatInput";
 export default function ChatClient() {
   const websocketRef = useRef(null);
   const [activeConversationId, setActiveConversationId] = useState(null);
+
+  console.log("ActiveConversationId: ", activeConversationId);
+
+  useEffect(() => {
+    if (!activeConversationId) {
+      return;
+    }
+
+    localStorage.setItem("activeConversationId", activeConversationId);
+  }, [activeConversationId]);
+
+  useEffect(() => {
+    const savedConversationId = localStorage.getItem("activeConversationId");
+
+    if (savedConversationId) {
+      setActiveConversationId(savedConversationId);
+    }
+  }, []);
+
+  useEffect(() => {
+    async function hydrateConversation() {
+      if (!activeConversationId) {
+        return;
+      }
+
+      const conversation = await getConversation(activeConversationId);
+
+      if (!conversation) {
+        return;
+      }
+
+      setMessages(
+        conversation.messages.map((message) => ({
+          id: crypto.randomUUID(),
+          ...message,
+        })),
+      );
+    }
+
+    hydrateConversation();
+  }, [activeConversationId]);
 
   const [messages, setMessages] = useState([
     {

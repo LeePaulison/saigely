@@ -1,0 +1,30 @@
+type User {
+  name: String
+  email: String
+}
+
+type Query {
+  me: User
+}
+
+type Message {
+  role: String
+  content: String
+}
+
+type Conversation {
+  id: ID
+  userId: String
+  messages: [Message]
+}
+
+type ConversationPreview {
+  id: ID
+  preview: String
+  updatedAt: String
+}
+
+extend type Query {
+  conversation(conversationId: ID!): Conversation
+  conversations: [ConversationPreview]
+}
