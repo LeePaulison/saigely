@@ -9,6 +9,7 @@ import ChatInput from "./ChatInput";
 
 export default function ChatClient() {
   const websocketRef = useRef(null);
+  const [activeConversationId, setActiveConversationId] = useState(null);
 
   const [messages, setMessages] = useState([
     {
@@ -19,7 +20,7 @@ export default function ChatClient() {
   ]);
 
   useEffect(() => {
-    const websocket = new WebSocket("ws://localhost:3000");
+    const websocket = new WebSocket("ws://localhost:3000/ws");
 
     websocketRef.current = websocket;
 
@@ -32,15 +33,25 @@ export default function ChatClient() {
 
       console.log("WS Message:", message);
 
-      if (message.type === "echo") {
-        setMessages((currentMessages) => [
-          ...currentMessages,
-          {
-            id: crypto.randomUUID(),
-            role: "assistant",
-            content: message.payload.content,
-          },
-        ]);
+      if (message.type === "chat_chunk") {
+        setMessages((currentMessages) => {
+          return currentMessages.map((currentMessage, index) => {
+            const isLastMessage = index === currentMessages.length - 1;
+
+            if (isLastMessage && currentMessage.role === "assistant") {
+              return {
+                ...currentMessage,
+                content: currentMessage.content + message.payload.content,
+              };
+            }
+
+            return currentMessage;
+          });
+        });
+      }
+
+      if (message.type === "chat_complete") {
+        setActiveConversationId(message.payload.conversationId);
       }
     };
 
@@ -60,16 +71,29 @@ export default function ChatClient() {
       content,
     };
 
-    setMessages((currentMessages) => [...currentMessages, userMessage]);
+    const assistantMessage = {
+      id: crypto.randomUUID(),
+      role: "assistant",
+      content: "",
+    };
+
+    setMessages((currentMessages) => [
+      ...currentMessages,
+      userMessage,
+      assistantMessage,
+    ]);
 
     websocketRef.current?.send(
       JSON.stringify({
         type: "chat_message",
-        content,
+
+        payload: {
+          conversationId: activeConversationId,
+          content,
+        },
       }),
     );
   }
-
   return (
     <ChatLayout>
       <MessageList>
