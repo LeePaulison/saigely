@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Saigely
+
+Saigely is a real-time AI chat application powered by OpenAI. It streams responses over WebSockets and persists conversations in MongoDB.
+
+## Tech Stack
+
+- **Framework** — [Next.js 16](https://nextjs.org) (App Router)
+- **Server** — Custom Node.js HTTP server (`server/server.js`) combining Next.js and WebSocket handling on a single port
+- **AI** — [OpenAI API](https://platform.openai.com) (GPT-4.1-mini, streaming completions)
+- **Real-time** — [ws](https://github.com/websockets/ws) WebSocket server with authenticated upgrade
+- **Auth** — [Better Auth](https://www.better-auth.com) with GitHub and Google OAuth
+- **Auth DB** — SQLite (via better-sqlite3)
+- **Chat DB** — MongoDB for conversation persistence
+- **API** — [GraphQL Yoga](https://the-guild.dev/graphql/yoga-server) endpoint at `/api/graphql`
+- **Styling** — [Tailwind CSS v4](https://tailwindcss.com) + [Radix UI](https://www.radix-ui.com)
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org) >= 18
+- A running [MongoDB](https://www.mongodb.com) instance (local or Atlas)
+- An [OpenAI API key](https://platform.openai.com/api-keys)
+- OAuth credentials for [GitHub](https://github.com/settings/developers) and/or [Google](https://console.cloud.google.com/apis/credentials)
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file in the project root:
+
+```env
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
+
+# MongoDB
+MONGODB_URI=mongodb://localhost:27017
+
+# GitHub OAuth
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+### 3. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This starts the custom server with [nodemon](https://nodemon.io) on [http://localhost:3000](http://localhost:3000). The server handles both Next.js page requests and WebSocket connections on the `/ws` path.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+> To run only the Next.js dev server (without WebSocket support): `npm run next:dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+app/
+  layout.js              # Root layout (Geist font, Tailwind)
+  page.js                # Landing page with login link
+  login/page.js          # GitHub / Google OAuth login
+  (protected)/           # Auth-gated route group
+    layout.js            # Session check — redirects to /login if unauthenticated
+    chat/page.js         # Chat page
+  api/
+    auth/[...all]/route.js   # Better Auth API routes
+    graphql/route.js         # GraphQL Yoga endpoint
+features/
+  chat/components/       # ChatClient, ChatInput, ChatLayout, MessageBubble, MessageList
+lib/
+  auth/                  # Better Auth server & client configuration
+  db/
+    sqlite.js            # SQLite connection (auth data)
+    mongo.js             # MongoDB connection (conversations)
+  openai/
+    client.js            # OpenAI client
+    chat.js              # Streaming chat completion helper
+server/
+  server.js              # Custom HTTP server (Next.js + WebSocket)
+  websocket.js           # WebSocket message handling & OpenAI streaming
+  services/              # Conversation business logic
+  repositories/          # MongoDB data access (conversations collection)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the custom server with nodemon (Next.js + WebSocket) |
+| `npm run next:dev` | Start Next.js dev server only |
+| `npm run build` | Production build |
+| `npm start` | Start production server |
+| `npm run lint` | Run ESLint |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is not currently licensed for public use.
