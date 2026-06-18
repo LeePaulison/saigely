@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useUserStore } from "@/store/stores/userStore";
 
 import { ChatClient } from "./ChatClient";
 import { ConversationSidebar } from "./ConversationSidebar";
 
-export default function ChatLayout({ conversations }) {
+export default function ChatLayout() {
+  const currentUser = useUserStore((state) => state.user);
+  console.log("ChatLayout - currentUser: ", currentUser);
   const [activeConversationId, setActiveConversationId] = useState(null);
 
   useEffect(() => {
@@ -28,7 +31,7 @@ export default function ChatLayout({ conversations }) {
   return (
     <main className="flex h-screen w-full flex-row bg-background text-foreground">
       <ConversationSidebar
-        conversations={conversations}
+        conversations={[]}
         activeConversationId={activeConversationId}
         onSelectConversation={setActiveConversationId}
       />

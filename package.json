@@ -7,8 +7,7 @@
     "next:dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "dev": "nodemon server/server.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "@graphql-tools/load-files": "^7.0.1",
@@ -25,7 +24,8 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "ws": "^8.20.0"
+    "ws": "^8.20.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

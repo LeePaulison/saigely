@@ -29,7 +29,7 @@ export const ChatClient = ({
         return;
       }
 
-      const conversation = await getConversation(activeConversationId);
+      const conversation = null; //await getConversation(activeConversationId);
 
       if (!conversation) {
         return;
@@ -109,6 +109,11 @@ export const ChatClient = ({
       userMessage,
       assistantMessage,
     ]);
+
+    console.log("Sending message", {
+      activeConversationId,
+      content,
+    });
 
     websocketRef.current?.send(
       JSON.stringify({

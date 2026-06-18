@@ -1,8 +1,0 @@
-import { betterAuth } from "better-auth";
-import { db } from "../db/sqlite";
-
-const auth = betterAuth({
-  database: db,
-});
-
-export default auth;
