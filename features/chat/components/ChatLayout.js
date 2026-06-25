@@ -1,24 +1,44 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useUserStore } from "@/store/stores/userStore";
+import { useConversationsStore } from "@/store/stores/conversationsStore";
+import { getPreferences } from "@/lib/graphql/preference/preference";
 
 import { ChatClient } from "./ChatClient";
 import { ConversationSidebar } from "./ConversationSidebar";
 
-export default function ChatLayout() {
+export default function ChatLayout({ conversations }) {
   const currentUser = useUserStore((state) => state.user);
-  console.log("ChatLayout - currentUser: ", currentUser);
-  const [activeConversationId, setActiveConversationId] = useState(null);
+  const activeConversationId = useConversationsStore(
+    (state) => state.activeConversationId,
+  );
+
+  const setActiveConversationId = useConversationsStore(
+    (state) => state.setActiveConversationId,
+  );
+
+  const setConversations = useConversationsStore(
+    (state) => state.setConversations,
+  );
 
   useEffect(() => {
-    const savedConversationId = localStorage.getItem("activeConversationId");
+    setConversations(conversations);
 
-    if (savedConversationId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveConversationId(savedConversationId);
+    const storedConversationId = localStorage.getItem("activeConversationId");
+
+    if (!storedConversationId) {
+      return;
     }
-  }, []);
+
+    const exists = conversations.some(
+      (conversation) => conversation.id === storedConversationId,
+    );
+
+    if (exists) {
+      setActiveConversationId(storedConversationId);
+    }
+  }, [conversations, setActiveConversationId, setConversations]);
 
   useEffect(() => {
     if (!activeConversationId) {
@@ -28,10 +48,16 @@ export default function ChatLayout() {
     localStorage.setItem("activeConversationId", activeConversationId);
   }, [activeConversationId]);
 
+  useEffect(() => {
+    (async () => {
+      const result = await getPreferences();
+      console.log(result);
+    })();
+  }, []);
+
   return (
     <main className="flex h-screen w-full flex-row bg-background text-foreground">
       <ConversationSidebar
-        conversations={[]}
         activeConversationId={activeConversationId}
         onSelectConversation={setActiveConversationId}
       />

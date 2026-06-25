@@ -1,10 +1,15 @@
 "use client";
 
+import { useConversationsStore } from "@/store/stores/conversationsStore";
+
 export const ConversationSidebar = ({
-  conversations,
   activeConversationId,
   onSelectConversation,
 }) => {
+  const conversations = useConversationsStore((state) => state.conversations);
+
+  console.log("ConversationSidebar - conversations: ", conversations);
+
   if (!conversations) return null;
 
   return (

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { getConversation } from "../api/getConversation";
+import { getConversation } from "@/lib/graphql/conversation/conversation";
+import { useChatSocket } from "@/hooks/useChatSocket";
 
 import MessageList from "./MessageList";
 import MessageBubble from "./MessageBubble";
@@ -29,7 +30,7 @@ export const ChatClient = ({
         return;
       }
 
-      const conversation = null; //await getConversation(activeConversationId);
+      const conversation = await getConversation(activeConversationId);
 
       if (!conversation) {
         return;
@@ -46,50 +47,28 @@ export const ChatClient = ({
     hydrateConversation();
   }, [activeConversationId]);
 
-  useEffect(() => {
-    const websocket = new WebSocket("ws://localhost:3000/ws");
+  const { connected, send } = useChatSocket({
+    onChatChunk: (payload) => {
+      setMessages((currentMessages) => {
+        return currentMessages.map((currentMessage, index) => {
+          const isLastMessage = index === currentMessages.length - 1;
 
-    websocketRef.current = websocket;
+          if (isLastMessage && currentMessage.role === "assistant") {
+            return {
+              ...currentMessage,
+              content: currentMessage.content + payload.content,
+            };
+          }
 
-    websocket.onopen = () => {
-      console.log("WebSocket connected");
-    };
-
-    websocket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-
-      console.log("WS Message:", message);
-
-      if (message.type === "chat_chunk") {
-        setMessages((currentMessages) => {
-          return currentMessages.map((currentMessage, index) => {
-            const isLastMessage = index === currentMessages.length - 1;
-
-            if (isLastMessage && currentMessage.role === "assistant") {
-              return {
-                ...currentMessage,
-                content: currentMessage.content + message.payload.content,
-              };
-            }
-
-            return currentMessage;
-          });
+          return currentMessage;
         });
-      }
+      });
+    },
 
-      if (message.type === "chat_complete") {
-        setActiveConversationId(message.payload.conversationId);
-      }
-    };
-
-    websocket.onclose = () => {
-      console.log("WebSocket disconnected");
-    };
-
-    return () => {
-      websocket.close();
-    };
-  }, []);
+    onChatComplete: (payload) => {
+      setActiveConversationId(payload.conversationId);
+    },
+  });
 
   function handleSendMessage(content) {
     const userMessage = {
@@ -110,22 +89,15 @@ export const ChatClient = ({
       assistantMessage,
     ]);
 
-    console.log("Sending message", {
-      activeConversationId,
-      content,
+    send({
+      type: "chat_message",
+      payload: {
+        content,
+        conversationId: activeConversationId,
+      },
     });
-
-    websocketRef.current?.send(
-      JSON.stringify({
-        type: "chat_message",
-
-        payload: {
-          conversationId: activeConversationId,
-          content,
-        },
-      }),
-    );
   }
+
   return (
     <div className="flex flex-col w-full">
       <MessageList>
