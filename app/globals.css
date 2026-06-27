@@ -1,26 +1,364 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-background: var(--color-mist-50);
+  --color-surface: white;
+  --color-surface-secondary: var(--color-mist-100);
+
+  --color-foreground: var(--color-emerald-950);
+  --color-muted: var(--color-mist-700);
+
+  --color-border: var(--color-mist-300);
+
+  --color-primary: var(--color-sky-500);
+  --color-primary-hover: var(--color-sky-600);
+
+  --color-sidebar: var(--color-mist-100);
+  --color-sidebar-hover: var(--color-mist-200);
+
+  --color-ring: var(--color-sky-400);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+.dark {
+  --color-background: var(--color-emerald-980);
+  --color-surface: var(--color-emerald-970);
+  --color-surface-secondary: var(--color-emerald-960);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-foreground: var(--color-mist-50);
+  --color-muted: var(--color-mist-400);
+
+  --color-border: var(--color-emerald-900);
+
+  --color-primary: var(--color-sky-500);
+  --color-primary-hover: var(--color-sky-400);
+
+  --color-sidebar: var(--color-emerald-970);
+  --color-sidebar-hover: var(--color-emerald-960);
+
+  --color-ring: var(--color-sky-400);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.ScrollAreaRoot {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  --scrollbar-size: 10px;
+}
+
+.ScrollAreaViewport {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.ScrollAreaScrollbar {
+  display: flex;
+  /* ensures no selection */
+  user-select: none;
+  /* disable browser handling of all panning and zooming gestures on touch devices */
+  touch-action: none;
+  padding: 2px;
+  background: #666666;
+  transition: background 160ms ease-out;
+}
+.ScrollAreaScrollbar:hover {
+  background: #333333;
+}
+.ScrollAreaScrollbar[data-orientation="vertical"] {
+  width: var(--scrollbar-size);
+}
+.ScrollAreaScrollbar[data-orientation="horizontal"] {
+  flex-direction: column;
+  height: var(--scrollbar-size);
+}
+
+.ScrollAreaThumb {
+  flex: 1;
+  background: blue;
+  border-radius: var(--scrollbar-size);
+  position: relative;
+}
+/* increase target size for touch devices https://www.w3.org/WAI/WCAG21/Understanding/target-size.html */
+.ScrollAreaThumb::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.ScrollAreaCorner {
+  background: #666666;
+}
+
+.NavigationMenuRoot {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
+}
+
+.NavigationMenuList {
+  display: flex;
+  justify-content: center;
+  color: var(--color-foreground);
+  padding: 4px;
+  border-radius: 6px;
+  list-style: none;
+  margin: 0;
+}
+
+.NavigationMenuTrigger,
+.NavigationMenuLink {
+  padding: 8px 12px;
+  outline: none;
+  user-select: none;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 4px;
+  font-size: 15px;
+  color: var(--color-foreground-muted);
+}
+
+.NavigationMenuTrigger:focus,
+.NavigationMenuLink:focus {
+  box-shadow: 0 0 0 2px var(--color-ring);
+}
+
+.NavigationMenuTrigger:hover,
+.NavigationMenuLink:hover {
+  background-color: var(--color-surface-secondary);
+  color: var(--color-foreground);
+}
+
+.NavigationMenuTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.NavigationMenuLink {
+  display: block;
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.NavigationMenuContent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  animation-duration: 250ms;
+  animation-timing-function: ease;
+}
+.NavigationMenuContent[data-motion="from-start"] {
+  animation-name: enterFromLeft;
+}
+.NavigationMenuContent[data-motion="from-end"] {
+  animation-name: enterFromRight;
+}
+.NavigationMenuContent[data-motion="to-start"] {
+  animation-name: exitToLeft;
+}
+.NavigationMenuContent[data-motion="to-end"] {
+  animation-name: exitToRight;
+}
+@media only screen and (min-width: 600px) {
+  .NavigationMenuContent {
+    width: auto;
+  }
+}
+
+.NavigationMenuIndicator {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 10px;
+  top: 100%;
+  overflow: hidden;
+  z-index: 1;
+  transition:
+    width,
+    transform 250ms ease;
+}
+.NavigationMenuIndicator[data-state="visible"] {
+  animation: fadeIn 200ms ease;
+}
+.NavigationMenuIndicator[data-state="hidden"] {
+  animation: fadeOut 200ms ease;
+}
+
+.NavigationMenuViewport {
+  position: relative;
+  transform-origin: top center;
+  margin-top: 10px;
+  width: var(--radix-navigation-menu-viewport-width);
+  height: var(--radix-navigation-menu-viewport-height);
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow:
+    rgb(0 0 0 / 0.28) 0px 10px 38px -10px,
+    rgb(0 0 0 / 0.18) 0px 10px 20px -15px;
+  transition:
+    width 300ms ease,
+    height 300ms ease;
+}
+
+.NavigationMenuViewport[data-state="open"] {
+  animation: scaleIn 200ms ease;
+}
+.NavigationMenuViewport[data-state="closed"] {
+  animation: scaleOut 200ms ease;
+}
+@media only screen and (min-width: 600px) {
+  .NavigationMenuViewport {
+    width: var(--radix-navigation-menu-viewport-width);
+  }
+}
+
+.List {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  inline-size: 11rem;
+}
+
+.ListItemLink {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.375rem;
+  color: var(--color-foreground);
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.ListItemLink:hover {
+  background-color: var(--color-surface-secondary);
+}
+
+.ViewportPosition {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  top: 100%;
+  left: 0;
+  perspective: 2000px;
+}
+
+.CaretDown {
+  position: relative;
+  color: var(--color-foreground-muted);
+  top: 1px;
+  transition: transform 250ms ease;
+}
+
+.Arrow {
+  position: relative;
+  top: 70%;
+  background-color: var(--color-border);
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  border-top-left-radius: 2px;
+}
+
+@keyframes enterFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(200px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes enterFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-200px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes exitToRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(200px);
+  }
+}
+
+@keyframes exitToLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-200px);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: rotateX(-30deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotateX(0deg) scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: rotateX(0deg) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: rotateX(-10deg) scale(0.95);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
