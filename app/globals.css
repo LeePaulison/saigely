@@ -74,6 +74,13 @@
   --color-sidebar-active: var(--color-sidebar-active);
 
   --color-ring: var(--color-ring);
+
+  --color-message: var(--color-message);
+  --color-message-user: var(--color-message-user);
+
+  --color-input: var(--color-input);
+  --color-input-placeholder: var(--color-input-placeholder);
+  --color-send: var(--color-send);
 }
 
 /* ==========================================================================
@@ -90,7 +97,7 @@
   --color-surface-secondary: var(--color-slate-100);
   --color-surface-tertiary: var(--color-slate-200);
 
-  --color-foreground: var(--color-slate-90);
+  --color-foreground: var(--color-slate-900);
   --color-foreground-muted: var(--color-slate-600);
 
   --color-border: var(--color-slate-200);
@@ -98,10 +105,17 @@
   --color-primary: var(--color-emerald-700);
   --color-primary-hover: var(--color-emerald-600);
 
-  --color-sidebar-hover: var(--color-slate-300);
-  --color-sidebar-active: var(--color-slate-200);
+  --color-sidebar-hover: var(--color-slate-400);
+  --color-sidebar-active: var(--color-slate-300);
 
   --color-ring: var(--color-emerald-600);
+
+  --color-message: var(--color-mist-600);
+  --color-message-user: var(--color-emerald-700);
+
+  --color-input: var(--color-mist-600);
+  --color-input-placeholder: var(--color-slate-50);
+  --color-send: var(--color-emerald-700);
 }
 
 /* ==========================================================================
@@ -129,6 +143,13 @@
   --color-sidebar-active: var(--color-slate-800);
 
   --color-ring: var(--color-emerald-600);
+
+  --color-message: var(--color-mist-800);
+  --color-message-user: var(--color-emerald-800);
+
+  --color-input: var(--color-mist-800);
+  --color-input-placeholder: var(--color-slate-50);
+  --color-send: var(--color-emerald-800);
 }
 
 body {
