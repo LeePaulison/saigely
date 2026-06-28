@@ -89,7 +89,7 @@
   --color-surface-secondary: var(--color-slate-100);
   --color-surface-tertiary: var(--color-slate-200);
 
-  --color-foreground: var(--color-slate-950);
+  --color-foreground: var(--color-slate-90);
   --color-foreground-muted: var(--color-slate-600);
 
   --color-border: var(--color-slate-200);
@@ -215,8 +215,9 @@ body {
 .NavigationMenuList {
   display: flex;
   justify-content: center;
+  gap: 0.25rem;
   color: var(--color-foreground);
-  padding: 4px;
+  padding: 0.25rem;
   border-radius: 6px;
   list-style: none;
   margin: 0;
@@ -224,7 +225,7 @@ body {
 
 .NavigationMenuTrigger,
 .NavigationMenuLink {
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   outline: none;
   user-select: none;
   font-weight: 500;
@@ -241,7 +242,7 @@ body {
 
 .NavigationMenuTrigger:hover,
 .NavigationMenuLink:hover {
-  background-color: var(--color-surface-secondary);
+  background-color: var(--color-surface-tertiary);
   color: var(--color-foreground);
 }
 
@@ -249,7 +250,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2px;
+  gap: 0.25rem;
 }
 
 .NavigationMenuLink {
@@ -338,7 +339,7 @@ body {
 .List {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
+  padding: 0.75rem;
   inline-size: 11rem;
 }
 
