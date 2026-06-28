@@ -71,6 +71,7 @@
 
   --color-sidebar: var(--color-sidebar);
   --color-sidebar-hover: var(--color-sidebar-hover);
+  --color-sidebar-active: var(--color-sidebar-active);
 
   --color-ring: var(--color-ring);
 }
@@ -97,8 +98,8 @@
   --color-primary: var(--color-emerald-700);
   --color-primary-hover: var(--color-emerald-600);
 
-  --color-sidebar: var(--color-slate-100);
-  --color-sidebar-hover: var(--color-slate-200);
+  --color-sidebar-hover: var(--color-slate-300);
+  --color-sidebar-active: var(--color-slate-200);
 
   --color-ring: var(--color-emerald-600);
 }
@@ -124,8 +125,8 @@
   --color-primary: var(--color-emerald-700);
   --color-primary-hover: var(--color-emerald-600);
 
-  --color-sidebar: var(--color-slate-700);
-  --color-sidebar-hover: var(--color-slate-800);
+  --color-sidebar-hover: var(--color-slate-700);
+  --color-sidebar-active: var(--color-slate-800);
 
   --color-ring: var(--color-emerald-600);
 }

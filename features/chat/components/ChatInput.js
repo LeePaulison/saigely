@@ -27,12 +27,12 @@ export default function ChatInput({ onSendMessage }) {
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           placeholder="Send a message..."
-          className="flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-4 py-2 text-white outline-none"
+          className="flex-1 rounded-md border border-mist-700 bg-mist-900 px-4 py-2 text-white outline-none"
         />
 
         <button
           type="submit"
-          className="rounded-md bg-blue-600 px-4 py-2 text-white"
+          className="rounded-md bg-emerald-600 px-4 py-2 text-white"
         >
           Send
         </button>
