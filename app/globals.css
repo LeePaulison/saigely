@@ -1,41 +1,133 @@
 @import "tailwindcss";
 
-@theme {
-  --color-background: var(--color-mist-50);
-  --color-surface: white;
-  --color-surface-secondary: var(--color-mist-100);
+/* ==========================================================================
+   Saigely Theme
+   ========================================================================== */
 
-  --color-foreground: var(--color-emerald-950);
-  --color-muted: var(--color-mist-700);
+@theme inline {
+  /* ------------------------------------------------------------------------
+   Mist
+   ------------------------------------------------------------------------ */
 
-  --color-border: var(--color-mist-300);
+  --color-mist-50: oklch(0.985 0.004 175);
+  --color-mist-100: oklch(0.968 0.006 175);
+  --color-mist-200: oklch(0.935 0.009 175);
+  --color-mist-300: oklch(0.885 0.012 175);
+  --color-mist-400: oklch(0.8 0.015 175);
+  --color-mist-500: oklch(0.7 0.018 175);
+  --color-mist-600: oklch(0.6 0.02 175);
+  --color-mist-700: oklch(0.5 0.018 175);
+  --color-mist-800: oklch(0.39 0.015 175);
+  --color-mist-900: oklch(0.28 0.012 175);
 
-  --color-primary: var(--color-sky-500);
-  --color-primary-hover: var(--color-sky-600);
+  /* ------------------------------------------------------------------------
+     Slate (Foundation)
+     ------------------------------------------------------------------------ */
 
-  --color-sidebar: var(--color-mist-100);
-  --color-sidebar-hover: var(--color-mist-200);
+  --color-slate-50: oklch(0.984 0.003 255);
+  --color-slate-100: oklch(0.968 0.004 255);
+  --color-slate-200: oklch(0.928 0.006 255);
+  --color-slate-300: oklch(0.869 0.008 255);
+  --color-slate-400: oklch(0.704 0.011 255);
+  --color-slate-500: oklch(0.554 0.014 255);
+  --color-slate-600: oklch(0.446 0.014 255);
+  --color-slate-700: oklch(0.372 0.013 255);
+  --color-slate-800: oklch(0.279 0.011 255);
+  --color-slate-900: oklch(0.208 0.01 255);
+  --color-slate-950: oklch(0.129 0.008 255);
 
-  --color-ring: var(--color-sky-400);
+  /* Saigely extensions */
+
+  --color-slate-960: oklch(0.118 0.008 255);
+  --color-slate-970: oklch(0.108 0.007 255);
+  --color-slate-980: oklch(0.098 0.007 255);
+
+  /* ------------------------------------------------------------------------
+     Emerald (Brand)
+     ------------------------------------------------------------------------ */
+
+  --color-emerald-500: oklch(0.64 0.095 170);
+  --color-emerald-600: oklch(0.56 0.088 170);
+  --color-emerald-700: oklch(0.485 0.078 170);
+  --color-emerald-800: oklch(0.4 0.065 170);
+  --color-emerald-900: oklch(0.315 0.05 170);
+  --color-emerald-950: oklch(0.225 0.038 170);
 }
 
+@theme inline {
+  --color-background: var(--color-background);
+
+  --color-surface: var(--color-surface);
+  --color-surface-secondary: var(--color-surface-secondary);
+  --color-surface-tertiary: var(--color-surface-tertiary);
+
+  --color-foreground: var(--color-foreground);
+  --color-foreground-muted: var(--color-foreground-muted);
+
+  --color-border: var(--color-border);
+
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+
+  --color-sidebar: var(--color-sidebar);
+  --color-sidebar-hover: var(--color-sidebar-hover);
+
+  --color-ring: var(--color-ring);
+}
+
+/* ==========================================================================
+   Light Theme
+   ========================================================================== */
+
+:root,
+.light {
+  color-scheme: light;
+
+  --color-background: var(--color-slate-50);
+
+  --color-surface: white;
+  --color-surface-secondary: var(--color-slate-100);
+  --color-surface-tertiary: var(--color-slate-200);
+
+  --color-foreground: var(--color-slate-950);
+  --color-foreground-muted: var(--color-slate-600);
+
+  --color-border: var(--color-slate-200);
+
+  --color-primary: var(--color-emerald-700);
+  --color-primary-hover: var(--color-emerald-600);
+
+  --color-sidebar: var(--color-slate-100);
+  --color-sidebar-hover: var(--color-slate-200);
+
+  --color-ring: var(--color-emerald-600);
+}
+
+/* ==========================================================================
+   Dark Theme
+   ========================================================================== */
+
 .dark {
-  --color-background: var(--color-emerald-980);
-  --color-surface: var(--color-emerald-970);
-  --color-surface-secondary: var(--color-emerald-960);
+  color-scheme: dark;
 
-  --color-foreground: var(--color-mist-50);
-  --color-muted: var(--color-mist-400);
+  --color-background: var(--color-slate-900);
 
-  --color-border: var(--color-emerald-900);
+  --color-surface: var(--color-slate-800);
+  --color-surface-secondary: var(--color-slate-700);
+  --color-surface-tertiary: var(--color-slate-600);
 
-  --color-primary: var(--color-sky-500);
-  --color-primary-hover: var(--color-sky-400);
+  --color-foreground: var(--color-slate-50);
+  --color-foreground-muted: var(--color-slate-400);
 
-  --color-sidebar: var(--color-emerald-970);
-  --color-sidebar-hover: var(--color-emerald-960);
+  --color-border: color-mix(in oklch, var(--color-slate-700) 20%, transparent);
 
-  --color-ring: var(--color-sky-400);
+  --color-primary: var(--color-emerald-700);
+  --color-primary-hover: var(--color-emerald-600);
+
+  --color-sidebar: var(--color-slate-700);
+  --color-sidebar-hover: var(--color-slate-800);
+
+  --color-ring: var(--color-emerald-600);
 }
 
 body {
@@ -58,20 +150,26 @@ body {
 
 .ScrollAreaScrollbar {
   display: flex;
+
   /* ensures no selection */
   user-select: none;
+
   /* disable browser handling of all panning and zooming gestures on touch devices */
   touch-action: none;
+
   padding: 2px;
-  background: #666666;
-  transition: background 160ms ease-out;
+  background: var(--color-surface-secondary);
+  transition: background-color 160ms ease-out;
 }
+
 .ScrollAreaScrollbar:hover {
-  background: #333333;
+  background: var(--color-surface-tertiary);
 }
+
 .ScrollAreaScrollbar[data-orientation="vertical"] {
   width: var(--scrollbar-size);
 }
+
 .ScrollAreaScrollbar[data-orientation="horizontal"] {
   flex-direction: column;
   height: var(--scrollbar-size);
@@ -79,11 +177,18 @@ body {
 
 .ScrollAreaThumb {
   flex: 1;
-  background: blue;
+  background: var(--color-mist-400);
   border-radius: var(--scrollbar-size);
   position: relative;
+  transition: background-color 160ms ease-out;
 }
-/* increase target size for touch devices https://www.w3.org/WAI/WCAG21/Understanding/target-size.html */
+
+.ScrollAreaThumb:hover {
+  background: var(--color-mist-500);
+}
+
+/* increase target size for touch devices
+   https://www.w3.org/WAI/WCAG21/Understanding/target-size.html */
 .ScrollAreaThumb::before {
   content: "";
   position: absolute;
@@ -97,7 +202,7 @@ body {
 }
 
 .ScrollAreaCorner {
-  background: #666666;
+  background: var(--color-surface-secondary);
 }
 
 .NavigationMenuRoot {
@@ -249,7 +354,7 @@ body {
 }
 
 .ListItemLink:hover {
-  background-color: var(--color-surface-secondary);
+  background-color: var(--color-surface-tertiary);
 }
 
 .ViewportPosition {
@@ -272,7 +377,7 @@ body {
 .Arrow {
   position: relative;
   top: 70%;
-  background-color: var(--color-border);
+  background-color: var(--color-surface);
   width: 10px;
   height: 10px;
   transform: rotate(45deg);
