@@ -12,6 +12,8 @@ export const useHeaderPreferences = () => {
   const [aiModels, setAiModels] = useState([]);
 
   console.log("Preferences: ", preferences);
+  console.log("aiAgents: ", aiAgents);
+  console.log("aiModels: ", aiModels);
 
   const savePreferences = async (input) => {
     const updatedPreferences = await updatePreferences(input);
