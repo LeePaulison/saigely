@@ -227,266 +227,253 @@ body {
   background: var(--color-surface-secondary);
 }
 
-.NavigationMenuRoot {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  z-index: 1;
-}
+.DropdownMenuContent {
+  min-width: 220px;
 
-.NavigationMenuList {
-  display: flex;
-  justify-content: center;
-  gap: 0.25rem;
-  color: var(--color-foreground);
-  padding: 0.25rem;
-  border-radius: 6px;
-  list-style: none;
-  margin: 0;
-}
+  padding: 0.5rem;
 
-.NavigationMenuTrigger,
-.NavigationMenuLink {
-  padding: 0.5rem 0.75rem;
-  outline: none;
-  user-select: none;
-  font-weight: 500;
-  line-height: 1;
-  border-radius: 4px;
-  font-size: 15px;
-  color: var(--color-foreground-muted);
-}
-
-.NavigationMenuTrigger:focus,
-.NavigationMenuLink:focus {
-  box-shadow: 0 0 0 2px var(--color-ring);
-}
-
-.NavigationMenuTrigger:hover,
-.NavigationMenuLink:hover {
-  background-color: var(--color-surface-tertiary);
-  color: var(--color-foreground);
-}
-
-.NavigationMenuTrigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.25rem;
-}
-
-.NavigationMenuLink {
-  display: block;
-  text-decoration: none;
-  font-size: 15px;
-  line-height: 1;
-}
-
-.NavigationMenuContent {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  animation-duration: 250ms;
-  animation-timing-function: ease;
-}
-.NavigationMenuContent[data-motion="from-start"] {
-  animation-name: enterFromLeft;
-}
-.NavigationMenuContent[data-motion="from-end"] {
-  animation-name: enterFromRight;
-}
-.NavigationMenuContent[data-motion="to-start"] {
-  animation-name: exitToLeft;
-}
-.NavigationMenuContent[data-motion="to-end"] {
-  animation-name: exitToRight;
-}
-@media only screen and (min-width: 600px) {
-  .NavigationMenuContent {
-    width: auto;
-  }
-}
-
-.NavigationMenuIndicator {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  height: 10px;
-  top: 100%;
-  overflow: hidden;
-  z-index: 1;
-  transition:
-    width,
-    transform 250ms ease;
-}
-.NavigationMenuIndicator[data-state="visible"] {
-  animation: fadeIn 200ms ease;
-}
-.NavigationMenuIndicator[data-state="hidden"] {
-  animation: fadeOut 200ms ease;
-}
-
-.NavigationMenuViewport {
-  position: relative;
-  transform-origin: top center;
-  margin-top: 10px;
-  width: var(--radix-navigation-menu-viewport-width);
-  height: var(--radix-navigation-menu-viewport-height);
-  background-color: var(--color-surface);
-  color: var(--color-foreground);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: 0.75rem;
+
   box-shadow:
-    rgb(0 0 0 / 0.28) 0px 10px 38px -10px,
-    rgb(0 0 0 / 0.18) 0px 10px 20px -15px;
-  transition:
-    width 300ms ease,
-    height 300ms ease;
+    0 16px 40px rgb(0 0 0 / 28%),
+    0 4px 12px rgb(0 0 0 / 12%);
+
+  animation: dropdownShow 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.NavigationMenuViewport[data-state="open"] {
-  animation: scaleIn 200ms ease;
-}
-.NavigationMenuViewport[data-state="closed"] {
-  animation: scaleOut 200ms ease;
-}
-@media only screen and (min-width: 600px) {
-  .NavigationMenuViewport {
-    width: var(--radix-navigation-menu-viewport-width);
-  }
+.DropdownMenuContent:focus {
+  outline: none;
 }
 
-.List {
-  display: flex;
-  flex-direction: column;
-  padding: 0.75rem;
-  inline-size: 11rem;
-}
-
-.ListItemLink {
+.DropdownMenuItem {
   display: flex;
   align-items: center;
-  padding: 0.625rem 0.75rem;
-  border-radius: 0.375rem;
+  gap: 0.75rem;
+
+  height: 2.5rem;
+
+  padding: 0 0.75rem;
+
+  border-radius: 0.5rem;
+
   color: var(--color-foreground);
+
+  font-size: 0.9rem;
+
+  cursor: pointer;
+  user-select: none;
+
   transition:
     background-color 150ms ease,
     color 150ms ease;
 }
 
-.ListItemLink:hover {
-  background-color: var(--color-surface-tertiary);
+.DropdownMenuItem[data-highlighted] {
+  background: var(--color-surface-secondary);
+  outline: none;
 }
 
-.ViewportPosition {
-  position: absolute;
+.DropdownMenuItem[data-disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.DropdownMenuItemIcon {
   display: flex;
+  align-items: center;
   justify-content: center;
-  width: 100%;
-  top: 100%;
-  left: 0;
-  perspective: 2000px;
-}
 
-.CaretDown {
-  position: relative;
+  width: 18px;
+  height: 18px;
+
   color: var(--color-foreground-muted);
-  top: 1px;
-  transition: transform 250ms ease;
+
+  flex-shrink: 0;
 }
 
-.Arrow {
-  position: relative;
-  top: 70%;
-  background-color: var(--color-surface);
-  width: 10px;
-  height: 10px;
-  transform: rotate(45deg);
-  border-top-left-radius: 2px;
+.DropdownMenuItem[data-highlighted] .DropdownMenuItemIcon {
+  color: var(--color-primary);
 }
 
-@keyframes enterFromRight {
+.DropdownMenuLabel {
+  padding: 0.5rem 0.75rem 0.35rem;
+
+  color: var(--color-foreground-muted);
+
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.DropdownMenuSeparator {
+  height: 1px;
+
+  margin: 0.5rem 0;
+
+  background: var(--color-border);
+}
+
+.DropdownMenuShortcut {
+  margin-left: auto;
+
+  color: var(--color-foreground-muted);
+
+  font-size: 0.75rem;
+}
+
+.DropdownMenuArrow {
+  fill: var(--color-surface);
+}
+
+@keyframes dropdownShow {
   from {
     opacity: 0;
-    transform: translateX(200px);
+    transform: translateY(-4px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.DropdownMenuContent[data-side="top"] {
+  animation-name: dropdownUp;
+}
+
+@keyframes dropdownUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.DialogOverlay {
+  position: fixed;
+  inset: 0;
+
+  background: color-mix(in oklch, black 72%, transparent);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  animation: overlayShow 180ms ease;
+}
+
+.DialogContent {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: min(90vw, 560px);
+  max-height: 85svh;
+
+  overflow: auto;
+
+  padding: 1.5rem;
+  border-radius: 0.875rem;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  box-shadow:
+    0 24px 64px rgb(0 0 0 / 35%),
+    0 8px 24px rgb(0 0 0 / 18%);
+
+  animation: contentShow 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.DialogContent:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+.DialogTitle {
+  margin: 0;
+
+  color: var(--color-foreground);
+
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.DialogDescription {
+  margin: 0.5rem 0 1.5rem;
+
+  color: var(--color-foreground-muted);
+
+  line-height: 1.6;
+}
+
+.DialogSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.DialogField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.DialogLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+
+.DialogInput,
+.DialogSelect,
+.DialogSlider {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface-secondary);
+}
+
+.DialogInput:focus,
+.DialogSelect:focus {
+  border-color: var(--color-ring);
+}
+
+.DialogFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+
+  border-top: 1px solid var(--color-border);
+}
+
+@keyframes overlayShow {
+  from {
+    opacity: 0;
   }
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
-@keyframes enterFromLeft {
+@keyframes contentShow {
   from {
     opacity: 0;
-    transform: translateX(-200px);
+    transform: translate(-50%, -48%) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes exitToRight {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(200px);
-  }
-}
-
-@keyframes exitToLeft {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(-200px);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: rotateX(-30deg) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: rotateX(0deg) scale(1);
-  }
-}
-
-@keyframes scaleOut {
-  from {
-    opacity: 1;
-    transform: rotateX(0deg) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: rotateX(-10deg) scale(0.95);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
