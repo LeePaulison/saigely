@@ -12,8 +12,14 @@ import { SettingsDialog } from "./SettingsDialog";
 export const Header = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const { aiAgents, aiModels, preferences, savePreferences } =
-    useHeaderPreferences();
+  const {
+    aiAgents,
+    aiModels,
+    reasoningLevels,
+    verbosityLevels,
+    preferences,
+    savePreferences,
+  } = useHeaderPreferences();
 
   const router = useRouter();
 
@@ -39,6 +45,8 @@ export const Header = () => {
         onOpenChange={(open) => setSettingsOpen(open)}
         aiAgents={aiAgents}
         aiModels={aiModels}
+        reasoningLevels={reasoningLevels}
+        verbosityLevels={verbosityLevels}
         preferences={preferences}
         onSave={savePreferences}
       />

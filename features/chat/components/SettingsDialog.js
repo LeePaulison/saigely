@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 
 import { Dialog } from "radix-ui";
+import { ScrollArea } from "radix-ui";
 import { useTheme } from "next-themes";
 
 export const SettingsDialog = ({
@@ -10,16 +11,24 @@ export const SettingsDialog = ({
   onOpenChange,
   aiAgents,
   aiModels,
+  reasoningLevels,
+  verbosityLevels,
   preferences,
   onSave,
 }) => {
+  console.log("Preferences: ", preferences);
+  console.log("aiAgents: ", aiAgents);
+  console.log("aiModels: ", aiModels);
+  console.log("verbosityLevels: ", verbosityLevels);
+  console.log("reasoningLevels: ", reasoningLevels);
+
   const { theme, setTheme } = useTheme();
   const [model, setModel] = useState();
   const [temperature, setTemperature] = useState();
+  const [reasoning, setReasoning] = useState();
+  const [verbosity, setVerbosity] = useState();
   const [category, setCategory] = useState();
   const [agent, setAgent] = useState();
-
-  console.log("Values: ", theme, model, temperature, category, agent);
 
   const agentCategories = useMemo(() => {
     return [
@@ -36,26 +45,54 @@ export const SettingsDialog = ({
     return aiAgents.filter((agent) => agent.category === formattedCategory);
   }, [aiAgents, category]);
 
-  console.log("agent categories: ", agentCategories);
-  console.log("filtered agents: ", filteredAgents);
-
   const handleSave = async () => {
     await onSave({
       theme,
       defaultModelId: model,
       temperature,
+      defaultReasoningId: reasoning,
+      defaultVerbosityId: verbosity,
       defaultAgentId: agent,
     });
 
     onOpenChange(false);
   };
 
+  const selectedAgent = aiAgents.find((aiAgent) => aiAgent.agentId === agent);
+
+  const selectedReasoning = reasoningLevels.find(
+    (level) => level.levelId === reasoning,
+  );
+
+  const selectedVerbosity = verbosityLevels.find(
+    (level) => level.levelId === verbosity,
+  );
+
+  const selectedModel = aiModels.find((aiModel) => aiModel.modelId === model);
+  const supportsTemperature = !!selectedModel?.supportsTemperature;
+  const supportsReasoning = !!selectedModel?.supportsReasoning;
+  const supportsVerbosity = !!selectedModel?.supportsVerbosity;
+
+  useEffect(() => {
+    console.log("🔥 SettingsDialog effect fired");
+  }, []);
+
   useEffect(() => {
     if (!preferences) return;
+
+    console.log({
+      model: preferences.defaultModelId,
+      temperature: preferences.temperature,
+      reasoning: preferences.defaultReasoningId,
+      verbosity: preferences.defaultVerbosityId,
+      agent: preferences.defaultAgentId,
+    });
 
     setTheme(preferences.theme);
     setModel(preferences.defaultModelId);
     setTemperature(preferences.temperature);
+    setReasoning(preferences.defaultReasoningId);
+    setVerbosity(preferences.defaultVerbosityId);
     setAgent(preferences.defaultAgentId);
 
     const selectedAgent = aiAgents.find(
@@ -65,7 +102,7 @@ export const SettingsDialog = ({
     if (selectedAgent) {
       setCategory(selectedAgent.category);
     }
-  }, [preferences, aiAgents, setTheme]);
+  }, [open, preferences, aiAgents, setTheme]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -79,104 +116,184 @@ export const SettingsDialog = ({
             Customize your Saigely experience.
           </Dialog.Description>
 
-          <div className="DialogSection">
-            <div className="DialogField">
-              <label className="DialogLabel" htmlFor="theme">
-                Theme
-              </label>
+          <ScrollArea.Root className="DialogScrollArea">
+            <ScrollArea.Viewport className="DialogViewport">
+              <div className="DialogCard">
+                <div className="DialogCardTitle">Appearance</div>
 
-              <select
-                id="theme"
-                className="DialogSelect"
-                value={theme}
-                onChange={(event) => setTheme(event.target.value)}
-              >
-                <option value="system">System</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-              </select>
-            </div>
+                <div className="DialogSection">
+                  <div className="DialogField">
+                    <label className="DialogLabel" htmlFor="theme">
+                      Theme
+                    </label>
 
-            {/* AI Model */}
+                    <select
+                      id="theme"
+                      className="DialogSelect"
+                      value={theme}
+                      onChange={(event) => setTheme(event.target.value)}
+                    >
+                      <option value="system">System</option>
+                      <option value="light">Light</option>
+                      <option value="dark">Dark</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-            <div className="DialogField">
-              <label className="DialogLabel" htmlFor="model">
-                AI Model
-              </label>
+              {/* AI Model */}
+              <div className="DialogCard">
+                <div className="DialogCardTitle">Model</div>
 
-              <select
-                id="model"
-                className="DialogSelect"
-                value={model}
-                onChange={(event) => setModel(event.target.value)}
-              >
-                {aiModels.map((model) => (
-                  <option key={model.modelId} value={model.modelId}>
-                    {model.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <div className="DialogField">
+                  <label className="DialogLabel" htmlFor="model">
+                    AI Model
+                  </label>
 
-            {/* Temperature */}
+                  <select
+                    id="model"
+                    className="DialogSelect"
+                    value={model}
+                    onChange={(event) => setModel(event.target.value)}
+                  >
+                    {aiModels.map((model) => (
+                      <option key={model.modelId} value={model.modelId}>
+                        {model.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="FieldDescription">
+                    {selectedModel?.description}
+                  </p>
+                </div>
 
-            <div className="DialogField">
-              <label className="DialogLabel" htmlFor="temperature">
-                Temperature
-              </label>
+                {/* Temperature */}
 
-              <input
-                id="temperature"
-                type="range"
-                min="0"
-                max="2"
-                step="0.1"
-                className="DialogSlider"
-                value={temperature}
-                onChange={(event) => setTemperature(Number(event.target.value))}
-              />
-            </div>
-          </div>
+                {supportsTemperature && (
+                  <div className="DialogField">
+                    <label className="DialogLabel" htmlFor="temperature">
+                      Temperature
+                    </label>
 
-          {/* AI Agents */}
+                    <input
+                      id="temperature"
+                      type="range"
+                      min="0"
+                      max="2"
+                      step="0.1"
+                      className="DialogSlider"
+                      value={temperature}
+                      onChange={(event) =>
+                        setTemperature(Number(event.target.value))
+                      }
+                    />
+                  </div>
+                )}
 
-          <div className="DialogField">
-            <label className="DialogLabel" htmlFor="agent">
-              Agent Category
-            </label>
+                {supportsReasoning && (
+                  <div className="DialogField">
+                    <label className="DialogLabel" htmlFor="model">
+                      AI Model Reasoning
+                    </label>
 
-            <select
-              id="agent"
-              className="DialogSelect"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
+                    <select
+                      id="model"
+                      className="DialogSelect"
+                      value={reasoning}
+                      onChange={(event) => setReasoning(event.target.value)}
+                    >
+                      {reasoningLevels.map((level) => (
+                        <option key={level.levelId} value={level.levelId}>
+                          {level.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="FieldDescription">
+                      {selectedReasoning?.description}
+                    </p>
+                  </div>
+                )}
+
+                {supportsVerbosity && (
+                  <div className="DialogField">
+                    <label className="DialogLabel" htmlFor="model">
+                      AI Model Verbosity
+                    </label>
+
+                    <select
+                      id="model"
+                      className="DialogSelect"
+                      value={verbosity}
+                      onChange={(event) => setVerbosity(event.target.value)}
+                    >
+                      {verbosityLevels.map((level) => (
+                        <option key={level.levelId} value={level.levelId}>
+                          {level.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="FieldDescription">
+                      {selectedVerbosity?.description}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* AI Agents */}
+              <div className="DialogCard">
+                <div className="DialogCardTitle">Agent</div>
+
+                <div className="DialogField">
+                  <label className="DialogLabel" htmlFor="agent">
+                    Agent Category
+                  </label>
+
+                  <select
+                    id="agent"
+                    className="DialogSelect"
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                  >
+                    {agentCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="DialogField">
+                  <label className="DialogLabel" htmlFor="agent">
+                    Agent
+                  </label>
+
+                  <select
+                    id="agent"
+                    className="DialogSelect"
+                    value={agent}
+                    onChange={(event) => setAgent(event.target.value)}
+                  >
+                    {filteredAgents.map((agent) => (
+                      <option key={agent.agentId} value={agent.agentId}>
+                        {agent.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="FieldDescription mb-0">
+                    {selectedAgent?.description}
+                  </p>
+                </div>
+              </div>
+            </ScrollArea.Viewport>
+
+            <ScrollArea.Scrollbar
+              className="DialogScrollbar"
+              orientation="vertical"
             >
-              {agentCategories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="DialogField">
-            <label className="DialogLabel" htmlFor="agent">
-              Agent
-            </label>
-
-            <select
-              id="agent"
-              className="DialogSelect"
-              value={agent}
-              onChange={(event) => setAgent(event.target.value)}
-            >
-              {filteredAgents.map((agent) => (
-                <option key={agent.agentId} value={agent.agentId}>
-                  {agent.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              <ScrollArea.Thumb className="DialogScrollThumb" />
+            </ScrollArea.Scrollbar>
+            <ScrollArea.Corner className="DialogScrollCorner" />
+          </ScrollArea.Root>
 
           <div className="DialogFooter">
             <Dialog.Close asChild>
