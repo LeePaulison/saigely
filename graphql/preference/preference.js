@@ -25,6 +25,7 @@ export const getPreferences = async () => {
 };
 
 export const updatePreferences = async (input) => {
+  console.log("Updating preferences...", input);
   const result = await graphqlRequest({
     query: `
       mutation UpdatePreferences($input: UpdatePreferencesInput!) {

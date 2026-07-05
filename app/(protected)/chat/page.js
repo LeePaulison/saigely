@@ -1,4 +1,4 @@
-import ChatLayout from "@/components/ChatLayout";
+import ChatLayout from "@/components/chat/ChatLayout";
 
 import { getConversations } from "@/graphql/conversation/conversations";
 

@@ -1,3 +1,5 @@
+import { MarkdownRenderer } from "../markdown/MarkdownRenderer";
+
 export default function MessageBubble({ role, content }) {
   const isUser = role === "user";
 
@@ -9,7 +11,7 @@ export default function MessageBubble({ role, content }) {
           : "mr-auto bg-message text-slate-50"
       }`}
     >
-      {content}
+      <MarkdownRenderer content={content} />
     </div>
   );
 }

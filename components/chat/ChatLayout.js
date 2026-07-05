@@ -3,7 +3,7 @@
 import { useConversationsStore } from "@/store/stores/conversationsStore";
 import { useChatInitialization } from "@/hooks/useChatInitialization";
 
-import { Header } from "./Header";
+import { Header } from "../ui/Header";
 import { ChatClient } from "./ChatClient";
 import { ConversationSidebar } from "./ConversationSidebar";
 

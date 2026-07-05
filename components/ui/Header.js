@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth/auth-client";
 import { useHeaderPreferences } from "@/hooks/useHeaderPreferences";
 
 import { UserMenu } from "./UserMenu";
-import { SettingsDialog } from "./SettingsDialog";
+import { SettingsDialog } from "../chat/SettingsDialog";
 
 export const Header = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
