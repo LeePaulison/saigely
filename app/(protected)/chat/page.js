@@ -1,6 +1,6 @@
-import ChatLayout from "@/features/chat/components/ChatLayout";
+import ChatLayout from "@/components/ChatLayout";
 
-import { getConversations } from "@/lib/graphql/conversation/conversations";
+import { getConversations } from "@/graphql/conversation/conversations";
 
 export default async function ChatPage() {
   const conversations = await getConversations();

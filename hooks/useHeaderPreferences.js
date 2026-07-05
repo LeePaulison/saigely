@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 
 import { usePreferencesStore } from "@/store/stores/preferencesStore";
 
-import { updatePreferences } from "@/lib/graphql/preference/preference";
-import { getAiAgents } from "@/lib/graphql/ai/aiAgents";
-import { getAiModels } from "@/lib/graphql/ai/aiModels";
-import { getVerbosityLevels } from "@/lib/graphql/ai/verbosityLevels";
-import { getReasoningLevels } from "@/lib/graphql/ai/reasoningLevels";
+import { updatePreferences } from "@/graphql/preference/preference";
+import { getAiAgents } from "@/graphql/ai/aiAgents";
+import { getAiModels } from "@/graphql/ai/aiModels";
+import { getVerbosityLevels } from "@/graphql/ai/verbosityLevels";
+import { getReasoningLevels } from "@/graphql/ai/reasoningLevels";
 
 export const useHeaderPreferences = () => {
   const { preferences, setPreferences } = usePreferencesStore();

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
-import { getPreferences } from "@/lib/graphql/preference/preference";
-import { usePreferencesStore } from "../store/stores/preferencesStore";
+import { getPreferences } from "@/graphql/preference/preference";
+import { usePreferencesStore } from "@/store/stores/preferencesStore";
 import { useConversationsStore } from "@/store/stores/conversationsStore";
 
 export const useChatInitialization = (conversations) => {

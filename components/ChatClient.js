@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { getConversation } from "@/lib/graphql/conversation/conversation";
+import { getConversation } from "@/graphql/conversation/conversation";
 import { useChatSocket } from "@/hooks/useChatSocket";
 
 import { ScrollArea } from "radix-ui";
