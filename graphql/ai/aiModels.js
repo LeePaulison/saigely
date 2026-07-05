@@ -19,7 +19,5 @@ export const getAiModels = async () => {
     query: GET_AIMODELS_QUERY,
   });
 
-  console.log(result);
-
   return result.aiModels;
 };

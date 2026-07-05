@@ -16,12 +16,6 @@ export const SettingsDialog = ({
   preferences,
   onSave,
 }) => {
-  console.log("Preferences: ", preferences);
-  console.log("aiAgents: ", aiAgents);
-  console.log("aiModels: ", aiModels);
-  console.log("verbosityLevels: ", verbosityLevels);
-  console.log("reasoningLevels: ", reasoningLevels);
-
   const { theme, setTheme } = useTheme();
   const [model, setModel] = useState();
   const [temperature, setTemperature] = useState();
@@ -74,19 +68,7 @@ export const SettingsDialog = ({
   const supportsVerbosity = !!selectedModel?.supportsVerbosity;
 
   useEffect(() => {
-    console.log("🔥 SettingsDialog effect fired");
-  }, []);
-
-  useEffect(() => {
     if (!preferences) return;
-
-    console.log({
-      model: preferences.defaultModelId,
-      temperature: preferences.temperature,
-      reasoning: preferences.defaultReasoningId,
-      verbosity: preferences.defaultVerbosityId,
-      agent: preferences.defaultAgentId,
-    });
 
     setTheme(preferences.theme);
     setModel(preferences.defaultModelId);

@@ -19,13 +19,10 @@ export const getPreferences = async () => {
     query: GET_PREFERENCES_QUERY,
   });
 
-  console.log(result);
-
   return result.preferences;
 };
 
 export const updatePreferences = async (input) => {
-  console.log("Updating preferences...", input);
   const result = await graphqlRequest({
     query: `
       mutation UpdatePreferences($input: UpdatePreferencesInput!) {
@@ -42,8 +39,6 @@ export const updatePreferences = async (input) => {
     `,
     variables: { input },
   });
-
-  console.log(result);
 
   if (result.errors) {
     console.error("Result Errors: ", result.errors);

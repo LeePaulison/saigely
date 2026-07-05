@@ -17,11 +17,7 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
     };
 
     websocket.onmessage = (event) => {
-      console.log("RAW WS EVENT", event.data);
       const message = JSON.parse(event.data);
-
-      console.log("WS Message:", message);
-      console.log("WS Message type:", message.type);
 
       switch (message.type) {
         case "chat_chunk":
@@ -29,7 +25,6 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
           break;
 
         case "chat_complete":
-          console.log("Chat complete:", message.payload);
           onChatComplete?.(message.payload);
           break;
 

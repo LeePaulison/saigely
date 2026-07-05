@@ -8,8 +8,6 @@ export const ConversationSidebar = ({
 }) => {
   const conversations = useConversationsStore((state) => state.conversations);
 
-  console.log("ConversationSidebar - conversations: ", conversations);
-
   if (!conversations) return null;
 
   const formatter = new Intl.RelativeTimeFormat("en", {
@@ -50,7 +48,6 @@ export const ConversationSidebar = ({
       <div className="flex flex-1 flex-col overflow-y-auto">
         {conversations.map((conversation) => {
           const isActive = conversation.id === activeConversationId;
-          console.log("isActive: ", isActive);
           return (
             <button
               key={conversation.id}

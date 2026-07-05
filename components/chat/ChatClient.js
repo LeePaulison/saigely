@@ -24,8 +24,6 @@ export const ChatClient = ({
     },
   ]);
 
-  console.log("ActiveConversationId: ", activeConversationId);
-
   useEffect(() => {
     async function hydrateConversation() {
       if (!activeConversationId) {

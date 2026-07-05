@@ -16,7 +16,5 @@ export const getAiAgents = async () => {
     query: GET_AIAGENTS_QUERY,
   });
 
-  console.log(result);
-
   return result.aiAgents;
 };

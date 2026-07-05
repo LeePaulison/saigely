@@ -15,7 +15,5 @@ export async function getVerbosityLevels() {
     query: GET_VERBOSITY_LEVELS_QUERY,
   });
 
-  console.log(result);
-
   return result.verbosityLevels;
 }

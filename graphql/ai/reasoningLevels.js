@@ -15,7 +15,5 @@ export async function getReasoningLevels() {
     query: GET_REASONING_LEVELS_QUERY,
   });
 
-  console.log(result);
-
   return result.reasoningLevels;
 }

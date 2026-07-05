@@ -11,8 +11,6 @@ export async function graphqlRequest({ query, variables = {} }) {
     }),
   });
 
-  console.log("Request -- response: ", response);
-
   const result = await response.json();
 
   if (result.errors) {
