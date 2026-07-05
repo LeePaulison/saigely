@@ -1,10 +1,12 @@
 "use client";
 
+import { PlusIcon } from "@radix-ui/react-icons";
 import { useConversationsStore } from "@/store/stores/conversationsStore";
 
 export const ConversationSidebar = ({
   activeConversationId,
   onSelectConversation,
+  onNewConversation,
 }) => {
   const conversations = useConversationsStore((state) => state.conversations);
 
@@ -41,8 +43,14 @@ export const ConversationSidebar = ({
 
   return (
     <aside className="flex w-80 flex-col border-r border-border">
-      <div className="border-b border-border p-4">
-        <h2 className="text-lg font-semibold">Conversations</h2>
+      <div className="flex items-center justify-end border-b border-border p-2">
+        <button
+          onClick={() => onNewConversation()}
+          className="text-sm font-medium text-muted-foreground py-2 px-3 cursor-pointer rounded-sm hover:bg-sidebar-hover"
+        >
+          <PlusIcon className="w-4 h-4 mr-1 inline-block" />
+          <span>New Conversation</span>
+        </button>
       </div>
 
       <div className="flex flex-1 flex-col overflow-y-auto">

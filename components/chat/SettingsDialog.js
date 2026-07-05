@@ -48,8 +48,6 @@ export const SettingsDialog = ({
       defaultVerbosityId: verbosity,
       defaultAgentId: agent,
     });
-
-    onOpenChange(false);
   };
 
   const selectedAgent = aiAgents.find((aiAgent) => aiAgent.agentId === agent);
@@ -85,6 +83,12 @@ export const SettingsDialog = ({
       setCategory(selectedAgent.category);
     }
   }, [open, preferences, aiAgents, setTheme]);
+
+  useEffect(() => {
+    if (!filteredAgents.some((a) => a.agentId === agent)) {
+      setAgent(filteredAgents[0]?.agentId ?? "");
+    }
+  }, [filteredAgents, agent]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -253,11 +257,14 @@ export const SettingsDialog = ({
                     id="agent"
                     className="DialogSelect"
                     value={agent}
-                    onChange={(event) => setAgent(event.target.value)}
+                    onChange={(event) => {
+                      console.log("Agent: ", event.target.value);
+                      setAgent(event.target.value);
+                    }}
                   >
-                    {filteredAgents.map((agent) => (
-                      <option key={agent.agentId} value={agent.agentId}>
-                        {agent.name}
+                    {filteredAgents.map((elem) => (
+                      <option key={elem.agentId} value={elem.agentId}>
+                        {elem.name}
                       </option>
                     ))}
                   </select>
@@ -286,7 +293,7 @@ export const SettingsDialog = ({
 
             <button
               className="bg-primary text-white rounded-md py-2 px-3 hover:bg-primary-hover cursor-pointer"
-              onClick={handleSave}
+              onClick={() => handleSave()}
             >
               Save
             </button>
