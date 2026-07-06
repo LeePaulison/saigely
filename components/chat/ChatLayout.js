@@ -142,7 +142,7 @@ export default function ChatLayout({ conversations }) {
   }, [activeConversationId]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-background">
+    <div className="flex flex-col w-full h-full max-w-360 mx-auto">
       <Header />
       <main className="flex flex-1 flex-row w-full min-h-0">
         <ConversationSidebar

@@ -170,6 +170,12 @@ body {
   border-radius: inherit;
 }
 
+.ScrollAreaViewport > div:first-child {
+  display: block !important;
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .ScrollAreaScrollbar {
   display: flex;
 

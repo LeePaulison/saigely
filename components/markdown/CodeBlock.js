@@ -54,7 +54,7 @@ export const CodeBlock = (props) => {
     LANGUAGE_TITLES[language.toLowerCase()] || "Code";
 
   return (
-    <div className="overflow-hidden rounded-md bg-surface mt-2">
+    <div className="rounded-md bg-surface mt-2 w-full overflow-hidden">
       <div className="flex items-center justify-between border-b border-border bg-surface-secondary/25 px-3 py-2">
         <span className="text-xs text-foreground-muted font-semibold uppercase tracking-wide">
           {getLanguageTitle(language)}
@@ -77,6 +77,8 @@ export const CodeBlock = (props) => {
         customStyle={{
           margin: 0,
           background: "transparent",
+          overflowX: "auto",
+          maxWidth: "100%",
         }}
       >
         {String(children)}

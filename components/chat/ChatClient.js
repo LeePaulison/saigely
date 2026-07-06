@@ -12,7 +12,7 @@ export const ChatClient = ({
   handleSendMessage,
 }) => {
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-full overflow-hidden">
       <ScrollArea.Root className="ScrollAreaRoot">
         <ScrollArea.Viewport className="ScrollAreaViewport">
           <MessageList>
