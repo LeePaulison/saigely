@@ -1,46 +1,45 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { usePreferencesSelection } from "@/hooks/usePreferencesSelection";
 
 import { Dialog } from "radix-ui";
 import { ScrollArea } from "radix-ui";
 import { useTheme } from "next-themes";
 
-export const SettingsDialog = ({
-  open,
-  onOpenChange,
-  aiAgents,
-  aiModels,
-  reasoningLevels,
-  verbosityLevels,
-  preferences,
-  onSave,
-}) => {
+export const SettingsDialog = ({ open, onOpenChange }) => {
   const { theme, setTheme } = useTheme();
-  const [model, setModel] = useState();
-  const [temperature, setTemperature] = useState();
-  const [reasoning, setReasoning] = useState();
-  const [verbosity, setVerbosity] = useState();
-  const [category, setCategory] = useState();
-  const [agent, setAgent] = useState();
 
-  const agentCategories = useMemo(() => {
-    return [
-      ...new Set(aiAgents.map((agent) => agent.category).filter(Boolean)),
-    ];
-  }, [aiAgents]);
+  const {
+    models,
+    agents,
+    categories,
+    reasoningLevels,
+    verbosityLevels,
 
-  const filteredAgents = useMemo(() => {
-    if (!category) return [];
+    model,
+    temperature,
+    category,
+    agent,
+    reasoning,
+    verbosity,
 
-    const formattedCategory =
-      category.charAt(0).toUpperCase() + category.slice(1);
+    save,
 
-    return aiAgents.filter((agent) => agent.category === formattedCategory);
-  }, [aiAgents, category]);
+    selectedAgent,
+    selectedModel,
+    selectedReasoning,
+    selectedVerbosity,
+
+    setCategory,
+    setModel,
+    setTemperature,
+    setReasoning,
+    setVerbosity,
+    setAgent,
+  } = usePreferencesSelection();
 
   const handleSave = async () => {
-    await onSave({
+    await save({
       theme,
       defaultModelId: model,
       temperature,
@@ -50,45 +49,9 @@ export const SettingsDialog = ({
     });
   };
 
-  const selectedAgent = aiAgents.find((aiAgent) => aiAgent.agentId === agent);
-
-  const selectedReasoning = reasoningLevels.find(
-    (level) => level.levelId === reasoning,
-  );
-
-  const selectedVerbosity = verbosityLevels.find(
-    (level) => level.levelId === verbosity,
-  );
-
-  const selectedModel = aiModels.find((aiModel) => aiModel.modelId === model);
   const supportsTemperature = !!selectedModel?.supportsTemperature;
   const supportsReasoning = !!selectedModel?.supportsReasoning;
   const supportsVerbosity = !!selectedModel?.supportsVerbosity;
-
-  useEffect(() => {
-    if (!preferences) return;
-
-    setTheme(preferences.theme);
-    setModel(preferences.defaultModelId);
-    setTemperature(preferences.temperature);
-    setReasoning(preferences.defaultReasoningId);
-    setVerbosity(preferences.defaultVerbosityId);
-    setAgent(preferences.defaultAgentId);
-
-    const selectedAgent = aiAgents.find(
-      (agent) => agent.agentId === preferences.defaultAgentId,
-    );
-
-    if (selectedAgent) {
-      setCategory(selectedAgent.category);
-    }
-  }, [open, preferences, aiAgents, setTheme]);
-
-  useEffect(() => {
-    if (!filteredAgents.some((a) => a.agentId === agent)) {
-      setAgent(filteredAgents[0]?.agentId ?? "");
-    }
-  }, [filteredAgents, agent]);
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -142,7 +105,7 @@ export const SettingsDialog = ({
                     value={model}
                     onChange={(event) => setModel(event.target.value)}
                   >
-                    {aiModels.map((model) => (
+                    {models.map((model) => (
                       <option key={model.modelId} value={model.modelId}>
                         {model.name}
                       </option>
@@ -240,7 +203,7 @@ export const SettingsDialog = ({
                     value={category}
                     onChange={(event) => setCategory(event.target.value)}
                   >
-                    {agentCategories.map((category) => (
+                    {categories.map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
@@ -262,9 +225,9 @@ export const SettingsDialog = ({
                       setAgent(event.target.value);
                     }}
                   >
-                    {filteredAgents.map((elem) => (
-                      <option key={elem.agentId} value={elem.agentId}>
-                        {elem.name}
+                    {agents.map((agent) => (
+                      <option key={agent.agentId} value={agent.agentId}>
+                        {agent.name}
                       </option>
                     ))}
                   </select>

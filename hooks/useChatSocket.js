@@ -7,7 +7,7 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const websocket = new WebSocket("ws://localhost:3000/ws");
+    const websocket = new WebSocket(process.env.NEXT_PUBLIC_WS_SERVER);
 
     websocketRef.current = websocket;
 

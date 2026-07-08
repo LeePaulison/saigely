@@ -5,10 +5,8 @@ export default function MessageBubble({ role, content }) {
 
   return (
     <div
-      className={`max-w-[90%] rounded-lg px-4 py-3 ${
-        isUser
-          ? "ml-auto bg-message-user text-slate-50"
-          : "mr-auto bg-message text-slate-50"
+      className={`max-w-[90%] text-foreground rounded-lg px-4 py-3 ${
+        isUser ? "ml-auto bg-message-user" : "mr-auto bg-message"
       }`}
     >
       <MarkdownRenderer content={content} />

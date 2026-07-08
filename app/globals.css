@@ -110,8 +110,8 @@
 
   --color-ring: var(--color-emerald-600);
 
-  --color-message: var(--color-mist-600);
-  --color-message-user: var(--color-emerald-700);
+  --color-message: var(--color-mist-300);
+  --color-message-user: var(--color-mist-400);
 
   --color-input: var(--color-mist-600);
   --color-input-placeholder: var(--color-slate-50);
