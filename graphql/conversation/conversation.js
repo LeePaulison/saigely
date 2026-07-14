@@ -1,4 +1,4 @@
-import { graphqlRequest } from "../clientRequest";
+import { authRequest } from "@/graphql/authRequest";
 
 const GET_CONVERSATION_QUERY = `
   query GetConversation($id: ID!) {
@@ -17,12 +17,12 @@ const GET_CONVERSATION_QUERY = `
 `;
 
 export async function getConversation(id) {
-  const data = await graphqlRequest({
+  const result = await authRequest({
     query: GET_CONVERSATION_QUERY,
     variables: {
       id,
     },
   });
 
-  return data.conversation;
+  return result.conversation;
 }

@@ -18,7 +18,23 @@ type Conversation {
   messages: [Message!]!
 }
 
+type SaveConversationTurnPayload {
+  conversationId: ID!
+  preview: String!
+  updatedAt: String!
+}
+
+input SaveConversationTurnInput {
+  conversationId: ID
+  userMessage: String!
+  assistantMessage: String!
+}
+
 extend type Query {
   conversations: [ConversationSummary!]!
   conversation(id: ID!): Conversation
+}
+
+extend type Mutation {
+  saveConversationTurn(input: SaveConversationTurnInput!): SaveConversationTurnPayload!
 }

@@ -1,7 +1,9 @@
 import {
+  appendMessages,
+  createConversation,
   getUserConversations,
   getConversationById,
-} from "@/repositories/conversationRepository.js";
+} from "../../repositories/conversationRepository.js";
 
 export const conversationResolvers = {
   Query: {
@@ -32,6 +34,35 @@ export const conversationResolvers = {
     },
   },
 
+  Mutation: {
+    saveConversationTurn: async (_, { input }, context) => {
+      if (!context.authenticated) {
+        throw new Error("Unauthorized");
+      }
+
+      const now = new Date();
+      const messages = [
+        { role: "user", content: input.userMessage, createdAt: now },
+        { role: "assistant", content: input.assistantMessage, createdAt: now },
+      ];
+
+      if (!input.conversationId) {
+        return createConversation({ userId: context.user.id, messages });
+      }
+
+      const conversation = await getConversationById(input.conversationId);
+
+      if (!conversation || conversation.userId !== context.user.id) {
+        throw new Error("Conversation not found");
+      }
+
+      return appendMessages({
+        conversationId: input.conversationId,
+        messages,
+      });
+    },
+  },
+
   ConversationSummary: {
     id: (conversation) => conversation._id.toString(),
 
@@ -46,5 +77,12 @@ export const conversationResolvers = {
     createdAt: (conversation) => conversation.createdAt.toISOString(),
 
     updatedAt: (conversation) => conversation.updatedAt.toISOString(),
+  },
+
+  Message: {
+    createdAt: (message) =>
+      message.createdAt instanceof Date
+        ? message.createdAt.toISOString()
+        : message.createdAt,
   },
 };

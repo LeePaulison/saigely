@@ -1,7 +1,7 @@
-import { graphqlRequest } from "../clientRequest";
+import { serverAuthRequest } from "@/graphql/serverAuthRequest";
 
 export async function getConversations() {
-  const result = await graphqlRequest({
+  const result = await serverAuthRequest({
     query: `
       query Conversations {
         conversations {
@@ -13,5 +13,5 @@ export async function getConversations() {
     `,
   });
 
-  return result.data.conversations;
+  return result.conversations;
 }

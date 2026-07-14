@@ -12,6 +12,10 @@ import { ChatClient } from "./ChatClient";
 import { ConversationSidebar } from "./ConversationSidebar";
 
 export default function ChatLayout({ conversations }) {
+  const storedConversations = useConversationsStore(
+    (state) => state.conversations,
+  );
+
   const activeConversationId = useConversationsStore(
     (state) => state.activeConversationId,
   );
@@ -59,7 +63,7 @@ export default function ChatLayout({ conversations }) {
     onChatComplete: (payload) => {
       setActiveConversationId(payload.conversationId);
 
-      const conversation = conversations.find(
+      const conversation = storedConversations.find(
         (conversation) => conversation.id === payload.conversationId,
       );
 
@@ -75,6 +79,9 @@ export default function ChatLayout({ conversations }) {
           updatedAt: payload.updatedAt,
         });
       }
+    },
+    onError: (error) => {
+      console.error("Chat socket failed", error);
     },
   });
 
