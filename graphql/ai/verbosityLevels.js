@@ -1,4 +1,4 @@
-import { graphqlRequest } from "../graphqlClient";
+import { graphqlRequest } from "../clientRequest";
 
 const GET_VERBOSITY_LEVELS_QUERY = `
   query GetVerbosityLevels {

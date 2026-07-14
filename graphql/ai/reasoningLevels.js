@@ -1,4 +1,4 @@
-import { graphqlRequest } from "../graphqlClient";
+import { graphqlRequest } from "../clientRequest";
 
 const GET_REASONING_LEVELS_QUERY = `
   query GetReasoningLevels {

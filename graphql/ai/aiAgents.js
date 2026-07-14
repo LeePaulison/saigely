@@ -1,4 +1,4 @@
-import { graphqlRequest } from "../graphqlClient";
+import { graphqlRequest } from "../clientRequest";
 
 const GET_AIAGENTS_QUERY = `
   query GetAiAgents {

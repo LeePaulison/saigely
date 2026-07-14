@@ -1,5 +1,7 @@
-export async function graphqlRequest({ query, variables = {} }) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/graphql`, {
+// graphql/authRequest.js
+
+export async function authRequest({ query, variables = {} }) {
+  const response = await fetch("/api/graphql", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

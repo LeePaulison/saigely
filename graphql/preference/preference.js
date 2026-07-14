@@ -1,4 +1,4 @@
-import { graphqlRequest } from "../graphqlClient";
+import { authRequest } from "@/graphql/authRequest"
 
 const GET_PREFERENCES_QUERY = `
   query GetPreferences {
@@ -15,7 +15,7 @@ const GET_PREFERENCES_QUERY = `
 `;
 
 export const getPreferences = async () => {
-  const result = await graphqlRequest({
+  const result = await authRequest({
     query: GET_PREFERENCES_QUERY,
   });
 
@@ -23,7 +23,7 @@ export const getPreferences = async () => {
 };
 
 export const updatePreferences = async (input) => {
-  const result = await graphqlRequest({
+  const result = await authRequest({
     query: `
       mutation UpdatePreferences($input: UpdatePreferencesInput!) {
         updatePreferences(input: $input) {
@@ -39,12 +39,6 @@ export const updatePreferences = async (input) => {
     `,
     variables: { input },
   });
-
-  if (result.errors) {
-    console.error("Result Errors: ", result.errors);
-
-    throw new Error(result.errors.map((e) => e.message).join("\n"));
-  }
 
   return result.updatePreferences;
 };

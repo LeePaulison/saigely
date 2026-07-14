@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/getCurrentUser";
-import { UserProvider } from "@/providers/UserProvider";
+
+import { getSession } from "@/lib/auth/getSession";
 
 export default async function ProtectedLayout({ children }) {
-  const currentUser = await getCurrentUser();
+  const session = await getSession();
 
-  if (!currentUser.authenticated) {
-    return redirect("/login");
+  if (!session?.user) {
+    redirect("/login");
   }
 
-  return <UserProvider user={currentUser.user}>{children}</UserProvider>;
+  return children;
 }

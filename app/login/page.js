@@ -3,11 +3,13 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/auth-client";
-import { getMe } from "@/lib/auth/auth";
+
+import { getPreferences } from "@/graphql/preference/preference";
 
 export default function LoginPage() {
-  const callbackURL = "http://localhost:3001/chat";
+  const callbackURL = "http://localhost:3000/login"; // http://localhost:3001/chat
   const { data: session } = authClient.useSession();
+  console.log('Auth Client - session:', session);
   const router = useRouter();
 
   async function handleLogin({ provider }) {
@@ -21,11 +23,17 @@ export default function LoginPage() {
     if (!session) return;
 
     (async () => {
-      const currentUser = await getMe();
+       const currentUser = session.user;
 
-      if (!currentUser.authenticated) {
+      if (!currentUser) {
         return;
       }
+
+      console.log('User Session Generated: ', session)
+
+      const preferences = await getPreferences();
+
+      console.log('User Preferences: ', preferences)
 
       router.replace("/chat");
     })();

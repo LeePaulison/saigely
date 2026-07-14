@@ -1,4 +1,4 @@
-import { graphqlRequest } from "../request";
+import { graphqlRequest } from "../clientRequest";
 
 export async function getConversations() {
   const result = await graphqlRequest({
