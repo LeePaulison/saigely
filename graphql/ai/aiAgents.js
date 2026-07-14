@@ -1,4 +1,4 @@
-import { graphqlRequest } from "../clientRequest";
+import { authRequest } from "@/graphql/authRequest";
 
 const GET_AIAGENTS_QUERY = `
   query GetAiAgents {
@@ -12,7 +12,7 @@ const GET_AIAGENTS_QUERY = `
 `;
 
 export const getAiAgents = async () => {
-  const result = await graphqlRequest({
+  const result = await authRequest({
     query: GET_AIAGENTS_QUERY,
   });
 

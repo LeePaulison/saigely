@@ -1,4 +1,4 @@
-import { graphqlRequest } from "../clientRequest";
+import { authRequest } from "@/graphql/authRequest";
 
 const GET_REASONING_LEVELS_QUERY = `
   query GetReasoningLevels {
@@ -11,7 +11,7 @@ const GET_REASONING_LEVELS_QUERY = `
 `;
 
 export async function getReasoningLevels() {
-  const result = await graphqlRequest({
+  const result = await authRequest({
     query: GET_REASONING_LEVELS_QUERY,
   });
 

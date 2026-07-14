@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 
-import { db } from "@/lib/db/db";
+import { db } from "@/lib/db/neon";
 import { preferences } from "@/drizzle/preferences";
 
 export async function getPreferencesByUserId(userId) {
