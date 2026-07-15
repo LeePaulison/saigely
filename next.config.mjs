@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {/* config options here */};
+const nextConfig = {
+  outputFileTracingIncludes: {
+    "/api/graphql": ["./graphql/schemas/**/*.graphql"],
+  },
+};
 
 export default nextConfig;
