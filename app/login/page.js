@@ -7,7 +7,6 @@ import { authClient } from "@/lib/auth/auth-client";
 import { getPreferences } from "@/graphql/preference/preference";
 
 export default function LoginPage() {
-  const callbackURL = "http://localhost:3000/login"; // http://localhost:3001/chat
   const { data: session } = authClient.useSession();
   console.log('Auth Client - session:', session);
   const router = useRouter();
@@ -15,7 +14,7 @@ export default function LoginPage() {
   async function handleLogin({ provider }) {
     await authClient.signIn.social({
       provider: provider,
-      callbackURL: callbackURL,
+      callbackURL: "/chat",
     });
   }
 
