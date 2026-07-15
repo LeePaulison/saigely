@@ -1,278 +1,217 @@
 # Saigely
 
-Saigely is the Next.js frontend for a full-stack AI platform. It communicates with a standalone backend over GraphQL and authenticated WebSockets to provide real-time AI conversations, persistent chat history, and user preferences.
+Saigely is a full-stack AI chat application built with Next.js. It combines OAuth authentication, configurable AI preferences, persistent conversation history, Markdown rendering, file attachments, and token-by-token response streaming.
 
-Rather than being a simple chatbot, the project focuses on delivering a modern AI experience while demonstrating clean frontend architecture and integration with a dedicated backend API.
+The Next.js application owns the UI, authentication, GraphQL API, and data access. A separate Node.js WebSocket service handles OpenAI response streaming and calls the application's authenticated GraphQL API to load preferences and persist completed turns.
 
----
+Production: [saigely.vercel.app](https://saigely.vercel.app)
 
-# Features
+## Features
 
-- 🤖 Real-time AI conversations using the OpenAI Responses API
-- ⚡ Token streaming over authenticated WebSockets
-- 💬 Persistent conversation history
-- 🔐 GitHub and Google OAuth authentication
-- 👤 Persistent user preferences
-- 📡 GraphQL API integration
-- 🎨 Modern UI built with Next.js, Tailwind CSS, and Radix UI
-- 🌙 Light and dark themes
-- 🧩 Clean, component-driven frontend architecture
+- Streaming AI responses over authenticated WebSockets
+- GitHub and Google OAuth through Better Auth
+- Persistent conversations and messages
+- Per-user model, agent, temperature, reasoning, verbosity, and theme preferences
+- Markdown, syntax-highlighted code, tables, and text-file attachments
+- Responsive conversation sidebar and chat composer
+- Light, dark, and system themes
+- Short-lived RS256 JWTs for service-to-service authentication
 
----
+## Technology
 
-# Tech Stack
+### Next.js application
 
-## Frontend
-
-- Next.js 16 (App Router)
-- React 19
-- Tailwind CSS v4
-- Radix UI
+- Next.js 16 App Router and React 19
+- Tailwind CSS 4 and Radix UI
+- Better Auth with its JWT/JWKS plugin
+- GraphQL Yoga and GraphQL Tools
+- Drizzle ORM with Neon Postgres
+- MongoDB
 - Zustand
 
-## Backend (External API)
+### Streaming service
 
-- Node.js
-- Express
-- GraphQL Yoga
-- Better Auth
-- WebSocket server (`ws`)
+The companion `saigely-server` project is a small Node.js service using:
 
-## AI
+- `ws` for WebSocket connections
+- `jose` for JWT verification against the app's public JWKS
+- OpenAI Responses API for streamed model output
+- The Saigely GraphQL API for preferences, model/agent configuration, and persistence
 
-- OpenAI Responses API
-- Real-time streaming responses
+The service is currently hosted on Fly.io; the Next.js application is hosted on Vercel.
 
-## Data
+## Architecture
 
-### SQLite
+```text
+Browser
+  |
+  +-- HTTPS --> Next.js on Vercel
+  |               |-- Better Auth: sessions, OAuth, JWT/JWKS
+  |               |-- GraphQL Yoga: application API
+  |               |-- Neon Postgres: users, sessions, preferences,
+  |               |                   models, agents, and levels
+  |               `-- MongoDB: conversations and messages
+  |
+  `-- WSS ----> Streaming service on Fly.io
+                  |-- verifies JWT using the Vercel JWKS endpoint
+                  |-- streams responses from OpenAI
+                  `-- calls Vercel GraphQL with the user's bearer token
+```
 
-Stores:
+### Authentication flow
 
-- Authentication
+1. The user signs in with GitHub or Google through Better Auth.
+2. The browser receives a secure session cookie.
+3. Before opening the chat socket, the browser requests a short-lived JWT from Better Auth.
+4. The streaming service verifies the JWT against `/api/auth/jwks`, including the issuer and audience.
+5. The same JWT is forwarded to GraphQL when the service reads user configuration or saves a conversation turn.
+
+Default JWT claims expected by both projects:
+
+```text
+issuer:   saigely-next
+audience: saigely-websocket
+algorithm: RS256
+```
+
+## Data ownership
+
+### Neon Postgres
+
+- Better Auth users, accounts, sessions, verification records, and signing keys
 - User preferences
-- AI models
-- AI agents
-- Reasoning levels
-- Verbosity levels
+- Available AI models and agents
+- Reasoning and verbosity levels
 
 ### MongoDB
 
-Stores:
-
 - Conversations
-- Messages
+- User and assistant messages
+- Conversation previews and timestamps
 
----
-
-# Architecture
-
-```text
-                  Browser
-                     │
-                     ▼
-             Next.js Frontend
-                     │
-      ┌──────────────┴──────────────┐
-      │                             │
-  GraphQL API                   WebSocket
-      │                             │
-      └──────────────┬──────────────┘
-                     │
-                Saigely API
-                     │
-      ┌──────────────┼──────────────┐
-      │              │              │
- Better Auth     OpenAI API    Repositories
-      │                             │
-      ├──────── SQLite              │
-      └──────── MongoDB─────────────┘
-```
-
----
-
-# Frontend Structure
+## Repository layout
 
 ```text
-app/
-components/
-features/
-hooks/
-lib/
-providers/
-public/
-store/
+app/             Next.js pages, protected routes, and API route handlers
+components/      Chat, Markdown, settings, header, and menu UI
+drizzle/         Postgres table definitions and seed data
+graphql/         Schema, resolvers, context, and client/server request helpers
+hooks/           WebSocket and preference-selection hooks
+lib/             Better Auth, database clients, and chat utilities
+repositories/    Neon and MongoDB data-access functions
+store/           Zustand stores
+providers/       Client-side providers
 ```
 
----
+## Local development
 
-# Backend Integration
+### Prerequisites
 
-The frontend communicates with a standalone API server that follows a layered architecture.
+- Node.js 20.9 or newer
+- A Neon Postgres database with the Saigely schema and configuration data
+- A MongoDB database
+- GitHub and/or Google OAuth applications
+- The companion `saigely-server` running locally or at a reachable URL
+- An OpenAI API key configured in the companion server
 
-```text
-  GraphQL / WebSocket
-          │
-          ▼
-     Service Layer
-          │
-          ▼
-   Repository Layer
-          │
-          ▼
-   SQLite / MongoDB
-```
-
-Responsibilities:
-
-- **GraphQL** exposes application data.
-- **WebSockets** provide real-time AI streaming.
-- **Services** implement business logic.
-- **Repositories** isolate data access.
-- **SQLite** stores authentication and application configuration.
-- **MongoDB** stores conversations and messages.
-
----
-
-# Authentication
-
-Authentication is handled by Better Auth using OAuth providers.
-
-Supported providers:
-
-- GitHub
-- Google
-
-User sessions are shared across:
-
-- Next.js
-- GraphQL
-- WebSocket connections
-
-allowing authenticated, real-time AI conversations.
-
----
-
-# AI Streaming
-
-Messages are streamed from the OpenAI Responses API through the external backend.
-
-```text
-Browser
-    │
-WebSocket
-    │
-Saigely API
-    │
-OpenAI Responses API
-    │
-stream
-    ▼
-Browser
-```
-
-Conversation history is automatically persisted after each completed response.
-
----
-
-# Preferences
-
-Each authenticated user has persistent preferences stored by the backend.
-
-Current preferences include:
-
-- Theme
-- Default AI model
-- Default AI agent
-- Temperature
-- Reasoning level
-- Verbosity level
-
-These preferences are loaded during chat initialization and applied to future AI requests.
-
----
-
-# Getting Started
-
-## Prerequisites
-
-- Node.js 20+
-- A running Saigely API server
-- MongoDB
-- OpenAI API key
-- GitHub OAuth application (optional)
-- Google OAuth application (optional)
-
----
-
-## Installation
+### Install and run
 
 ```bash
 npm install
-```
-
----
-
-## Environment Variables
-
-Create a `.env.local` file in the project root.
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3000
-NEXT_PUBLIC_WS_URL=ws://localhost:3000/ws
-```
-
-> Additional environment variables required by the backend are configured in the Saigely API project.
-
----
-
-## Development
-
-Start the frontend:
-
-```bash
 npm run dev
 ```
 
-The frontend expects the Saigely API server to be running separately and communicates with it through GraphQL and authenticated WebSocket connections.
+The Next.js development server runs at `http://localhost:3000` by default.
 
----
+### Application environment
 
-# Available Scripts
+Create `.env.local` in the repository root. Local environment files are ignored by both Git and Vercel deployments.
+
+```env
+# Better Auth
+BETTER_AUTH_SECRET=replace-with-a-long-random-secret
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_AUTH_URL=http://localhost:3000
+
+# OAuth
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Data
+DATABASE_URL=postgresql://...
+MONGODB_URI=mongodb+srv://...
+
+# Browser-to-streaming-service connection
+NEXT_PUBLIC_WS_SERVER=ws://localhost:8080/ws
+```
+
+OAuth callback URLs for local development are:
+
+```text
+http://localhost:3000/api/auth/callback/github
+http://localhost:3000/api/auth/callback/google
+```
+
+`NEXT_PUBLIC_API_URL` exists for a legacy request helper but is not part of the active chat, authentication, or server-rendered GraphQL path.
+
+### Streaming-service environment
+
+Configure the companion server separately:
+
+```env
+HOST=0.0.0.0
+PORT=8080
+OPENAI_API_KEY=
+NEXTJS_ORIGIN=http://localhost:3000
+CORS_ORIGIN=http://localhost:3000
+JWT_ISSUER=saigely-next
+JWT_AUDIENCE=saigely-websocket
+```
+
+`NEXTJS_ORIGIN` must be reachable from the streaming service. In a hosted environment it cannot point to `localhost`; it must use the deployed Next.js origin.
+
+## Scripts
 
 | Command | Description |
-|----------|-------------|
+| --- | --- |
 | `npm run dev` | Start the Next.js development server |
-| `npm run build` | Create a production build |
-| `npm start` | Start the production server |
+| `npm run build` | Create an optimized production build |
+| `npm start` | Serve a completed production build |
 | `npm run lint` | Run ESLint |
 
----
+## Production deployment
 
-# Related Projects
+The current production topology is:
 
-- **Saigely Frontend** (this repository)
-- **Saigely API** — Express, GraphQL, Better Auth, WebSockets, SQLite, MongoDB, and OpenAI integration.
+- Next.js application: Vercel
+- WebSocket/OpenAI service: Fly.io
+- Relational database: Neon Postgres
+- Conversation database: MongoDB
 
----
+Vercel needs the application environment variables above, scoped to Production. Production additionally uses:
 
-# Purpose
+```env
+BETTER_AUTH_URL=https://saigely.vercel.app
+NEXT_PUBLIC_AUTH_URL=https://saigely.vercel.app
+NEXT_PUBLIC_WS_SERVER=wss://saigely-server.fly.dev/ws
+```
 
-Saigely was built as a portfolio project to demonstrate:
+The Fly service must use matching authentication settings:
 
-- Modern React architecture
-- Next.js App Router
-- GraphQL integration
-- Real-time WebSocket communication
-- AI application development
-- State management with Zustand
-- Authentication workflows
-- Integration with a layered backend architecture
+```env
+NEXTJS_ORIGIN=https://saigely.vercel.app
+JWT_ISSUER=saigely-next
+JWT_AUDIENCE=saigely-websocket
+```
 
-The project emphasizes maintainability, modularity, and modern frontend engineering practices rather than serving as a production SaaS application.
+The Vercel JWKS endpoint must be publicly reachable by Fly. Vercel Preview Deployment Protection blocks that request, so the public Production origin is used for the current integration.
 
----
+## Current scope
 
-# License
+Saigely is an MVP and portfolio project rather than a production SaaS offering. Its emphasis is a maintainable full-stack architecture, authenticated service boundaries, configurable AI behavior, and a polished streaming chat experience.
+
+## License
 
 This project is currently not licensed for public use.
