@@ -11,6 +11,7 @@ import { SettingsDialog } from "../chat/SettingsDialog";
 
 export const Header = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { data: session } = authClient.useSession();
 
   const router = useRouter();
 
@@ -28,6 +29,7 @@ export const Header = () => {
     <section className="flex justify-between items-center p-4 border-b border-border">
       <h1 className="font-bold text-2xl">sAIgely</h1>
       <UserMenu
+        user={session?.user}
         onOpenSettings={() => setSettingsOpen(true)}
         onLogout={handleLogout}
       />
