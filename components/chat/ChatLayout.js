@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { getConversation } from "@/graphql/conversation/conversation";
 import { useConversationsStore } from "@/store/stores/conversationsStore";
 import { useChatInitialization } from "@/hooks/useChatInitialization";
 import { useChatSocket } from "@/hooks/useChatSocket";
+import { parseTextAttachmentMessage } from "@/lib/chat/textAttachments";
 
 import { Header } from "../ui/Header";
 import { ChatClient } from "./ChatClient";
@@ -39,11 +40,15 @@ export default function ChatLayout({ conversations }) {
       content: "Welcome to Saigely.",
     },
   ]);
+  const [chatStatus, setChatStatus] = useState("connecting");
+  const savedStatusTimerRef = useRef(null);
 
   useChatInitialization(conversations);
 
   const { connected, send } = useChatSocket({
     onChatChunk: (payload) => {
+      setChatStatus("responding");
+
       setMessages((currentMessages) => {
         return currentMessages.map((currentMessage, index) => {
           const isLastMessage = index === currentMessages.length - 1;
@@ -61,6 +66,12 @@ export default function ChatLayout({ conversations }) {
     },
 
     onChatComplete: (payload) => {
+      setChatStatus("saved");
+      clearTimeout(savedStatusTimerRef.current);
+      savedStatusTimerRef.current = setTimeout(() => {
+        setChatStatus("ready");
+      }, 1500);
+
       setActiveConversationId(payload.conversationId);
 
       const conversation = storedConversations.find(
@@ -81,9 +92,22 @@ export default function ChatLayout({ conversations }) {
       }
     },
     onError: (error) => {
+      setChatStatus("error");
       console.error("Chat socket failed", error);
     },
   });
+
+  useEffect(() => {
+    return () => clearTimeout(savedStatusTimerRef.current);
+  }, []);
+
+  const composerStatus = connected
+    ? chatStatus === "connecting"
+      ? "ready"
+      : chatStatus
+    : chatStatus === "error"
+      ? "error"
+      : "connecting";
 
   function handleNewConversation() {
     setActiveConversationId(null);
@@ -98,10 +122,12 @@ export default function ChatLayout({ conversations }) {
   }
 
   function handleSendMessage(content) {
+    const parsedMessage = parseTextAttachmentMessage(content);
     const userMessage = {
       id: crypto.randomUUID(),
       role: "user",
-      content,
+      content: parsedMessage.message,
+      attachments: parsedMessage.attachments,
     };
 
     const assistantMessage = {
@@ -110,19 +136,26 @@ export default function ChatLayout({ conversations }) {
       content: "",
     };
 
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      userMessage,
-      assistantMessage,
-    ]);
-
-    send({
+    const sent = send({
       type: "chat_message",
       payload: {
         content,
         conversationId: activeConversationId,
       },
     });
+
+    if (!sent) {
+      setChatStatus("error");
+      return;
+    }
+
+    clearTimeout(savedStatusTimerRef.current);
+    setChatStatus("generating");
+    setMessages((currentMessages) => [
+      ...currentMessages,
+      userMessage,
+      assistantMessage,
+    ]);
   }
 
   useEffect(() => {
@@ -138,10 +171,19 @@ export default function ChatLayout({ conversations }) {
       }
 
       setMessages(
-        conversation.messages.map((message) => ({
-          id: crypto.randomUUID(),
-          ...message,
-        })),
+        conversation.messages.map((message) => {
+          const parsedMessage =
+            message.role === "user"
+              ? parseTextAttachmentMessage(message.content)
+              : { message: message.content, attachments: [] };
+
+          return {
+            id: crypto.randomUUID(),
+            ...message,
+            content: parsedMessage.message,
+            attachments: parsedMessage.attachments,
+          };
+        }),
       );
     }
 
@@ -162,6 +204,7 @@ export default function ChatLayout({ conversations }) {
           activeConversationId={activeConversationId}
           messages={messages}
           handleSendMessage={handleSendMessage}
+          chatStatus={composerStatus}
         />
       </main>
     </div>

@@ -5,14 +5,26 @@ import { CodeBlock } from "./CodeBlock";
 
 export const MarkdownRenderer = ({ content }) => {
   return (
-    <Markdown
-      components={{
-        code(props) {
-          return <CodeBlock {...props} />;
-        },
-      }}
-    >
-      {content}
-    </Markdown>
+    <div className="message-markdown">
+      <Markdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          pre({ children }) {
+            const code = Array.isArray(children) ? children[0] : children;
+
+            return (
+              <CodeBlock
+                className={code?.props?.className}
+                language={code?.props?.className?.replace(/^language-/, "")}
+              >
+                {code?.props?.children}
+              </CodeBlock>
+            );
+          },
+        }}
+      >
+        {content}
+      </Markdown>
+    </div>
   );
 };

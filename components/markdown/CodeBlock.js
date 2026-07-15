@@ -46,9 +46,9 @@ const LANGUAGE_TITLES = {
 };
 
 export const CodeBlock = (props) => {
-  const { className, children } = props;
+  const { className, children, language: languageProp } = props;
 
-  const language = className ? className.split("-").at(-1) : "text";
+  const language = languageProp || className?.replace(/^language-/, "") || "text";
 
   const getLanguageTitle = (language) =>
     LANGUAGE_TITLES[language.toLowerCase()] || "Code";

@@ -17,6 +17,7 @@ export function usePreferencesSelection() {
   const [verbosity, setVerbosity] = useState();
   const [category, setCategory] = useState();
   const [agent, setAgent] = useState();
+  const [savingSelection, setSavingSelection] = useState(false);
 
   const agentCategories = useMemo(() => {
     return [
@@ -92,8 +93,47 @@ export function usePreferencesSelection() {
     return savePreferences(rest);
   };
 
+  const saveModelSelection = async (nextModel) => {
+    const previousModel = model;
+
+    setModel(nextModel);
+    setSavingSelection(true);
+
+    try {
+      await save({ defaultModelId: nextModel });
+    } catch (error) {
+      setModel(previousModel);
+      throw error;
+    } finally {
+      setSavingSelection(false);
+    }
+  };
+
+  const saveAgentSelection = async (nextAgent) => {
+    const previousAgent = agent;
+    const previousCategory = category;
+    const nextCategory = aiAgents.find(
+      (item) => item.agentId === nextAgent,
+    )?.category;
+
+    setAgent(nextAgent);
+    setCategory(nextCategory ?? category);
+    setSavingSelection(true);
+
+    try {
+      await save({ defaultAgentId: nextAgent });
+    } catch (error) {
+      setAgent(previousAgent);
+      setCategory(previousCategory);
+      throw error;
+    } finally {
+      setSavingSelection(false);
+    }
+  };
+
   return {
     models: aiModels,
+    allAgents: aiAgents,
     agents: filteredAgents,
     categories: agentCategories,
     reasoningLevels,
@@ -108,6 +148,9 @@ export function usePreferencesSelection() {
 
     preferences,
     save,
+    savingSelection,
+    saveModelSelection,
+    saveAgentSelection,
 
     selectedAgent,
     selectedModel,
