@@ -5,6 +5,12 @@ type AiAgent {
   description: String!
 }
 
+type AiAgentConfiguration {
+  agentId: String!
+  systemPrompt: String!
+}
+
 extend type Query {
   aiAgents: [AiAgent!]!
+  aiAgentConfiguration(agentId: String!): AiAgentConfiguration
 }
