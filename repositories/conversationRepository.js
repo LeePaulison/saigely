@@ -98,11 +98,27 @@ export function createConversationRepository({ getDatabase = getMongoDatabase } 
       .toArray();
   }
 
+  async function deleteConversation({ conversationId, userId }) {
+    if (!ObjectId.isValid(conversationId)) {
+      return false;
+    }
+
+    const database = await getDatabase();
+    const conversationsCollection = database.collection("conversations");
+    const result = await conversationsCollection.deleteOne({
+      _id: new ObjectId(conversationId),
+      userId,
+    });
+
+    return result.deletedCount === 1;
+  }
+
   return {
     createConversation,
     appendMessages,
     getConversationById,
     getUserConversations,
+    deleteConversation,
   };
 }
 
@@ -111,4 +127,5 @@ export const {
   appendMessages,
   getConversationById,
   getUserConversations,
+  deleteConversation,
 } = createConversationRepository();

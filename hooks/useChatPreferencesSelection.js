@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 
 import { useHeaderPreferences } from "./useHeaderPreferences";
+import { useHydrated } from "./useHydrated";
 
 export function useChatPreferencesSelection() {
+  const hydrated = useHydrated();
   const {
     aiAgents,
     aiModels,
@@ -15,6 +17,7 @@ export function useChatPreferencesSelection() {
     () => [...new Set(aiAgents.map((agent) => agent.category).filter(Boolean))],
     [aiAgents],
   );
+  const hydratedPreferences = hydrated ? preferences : null;
 
   const saveSelection = async (updates) => {
     if (!preferences) return;
@@ -33,9 +36,9 @@ export function useChatPreferencesSelection() {
     models: aiModels,
     allAgents: aiAgents,
     categories,
-    model: preferences?.defaultModelId ?? "",
-    agent: preferences?.defaultAgentId ?? "",
-    preferences,
+    model: hydratedPreferences?.defaultModelId ?? "",
+    agent: hydratedPreferences?.defaultAgentId ?? "",
+    preferences: hydratedPreferences,
     savingSelection,
     saveModelSelection: (defaultModelId) => saveSelection({ defaultModelId }),
     saveAgentSelection: (defaultAgentId) => saveSelection({ defaultAgentId }),

@@ -37,4 +37,5 @@ extend type Query {
 
 extend type Mutation {
   saveConversationTurn(input: SaveConversationTurnInput!): SaveConversationTurnPayload!
+  deleteConversation(id: ID!): Boolean!
 }

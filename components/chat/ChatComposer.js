@@ -217,7 +217,7 @@ export default function ChatComposer({ onSendMessage, status = "connecting" }) {
           value={model ?? ""}
           disabled={selectionDisabled}
           onChange={saveSelection(saveModelSelection)}
-          className="min-w-32 rounded-md border border-transparent bg-transparent px-2 py-2 text-sm text-slate-50 outline-none hover:bg-mist-900 focus:border-mist-700 disabled:opacity-50"
+          className="ChatComposerSelect min-w-32"
         >
           {models.map((modelOption) => (
             <option key={modelOption.modelId} value={modelOption.modelId}>
@@ -232,7 +232,7 @@ export default function ChatComposer({ onSendMessage, status = "connecting" }) {
           value={agent ?? ""}
           disabled={selectionDisabled}
           onChange={saveSelection(saveAgentSelection)}
-          className="min-w-40 rounded-md border border-transparent bg-transparent px-2 py-2 text-sm text-slate-50 outline-none hover:bg-mist-900 focus:border-mist-700 disabled:opacity-50"
+          className="ChatComposerSelect min-w-40"
         >
           {categories.map((categoryOption, index) => (
             <Fragment key={categoryOption}>

@@ -9,6 +9,7 @@ function createRepository(overrides = {}) {
     createConversation: async () => assert.fail("unexpected createConversation call"),
     getConversationById: async () => assert.fail("unexpected getConversationById call"),
     getUserConversations: async () => assert.fail("unexpected getUserConversations call"),
+    deleteConversation: async () => assert.fail("unexpected deleteConversation call"),
     ...overrides,
   };
 }
@@ -23,6 +24,33 @@ test("unauthenticated users cannot read or save conversations", async () => {
     resolvers.Mutation.saveConversationTurn(null, { input: {} }, context),
     /Unauthorized/,
   );
+  await assert.rejects(
+    resolvers.Mutation.deleteConversation(null, { id: "id" }, context),
+    /Unauthorized/,
+  );
+});
+
+test("conversation deletion is scoped to the authenticated user", async () => {
+  let received;
+  const repository = createRepository({
+    deleteConversation: async (input) => {
+      received = input;
+      return true;
+    },
+  });
+  const resolvers = createConversationResolvers(repository);
+
+  const result = await resolvers.Mutation.deleteConversation(
+    null,
+    { id: "conversation-id" },
+    { authenticated: true, user: { id: "user-1" } },
+  );
+
+  assert.equal(result, true);
+  assert.deepEqual(received, {
+    conversationId: "conversation-id",
+    userId: "user-1",
+  });
 });
 
 test("conversation reads do not expose another user's data", async () => {

@@ -13,4 +13,10 @@ export const useConversationsStore = create((set) => ({
         conversation.id === id ? { ...conversation, ...updates } : conversation,
       ),
     })),
+  removeConversation: (id) =>
+    set((state) => ({
+      conversations: state.conversations.filter(
+        (conversation) => conversation.id !== id,
+      ),
+    })),
 }));

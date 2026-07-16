@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 import { getConversation } from "@/graphql/conversation/conversation";
+import { deleteConversation } from "@/graphql/conversation/deleteConversation";
 import { useConversationsStore } from "@/store/stores/conversationsStore";
 import { useChatInitialization } from "@/hooks/useChatInitialization";
 import { useChatSocket } from "@/hooks/useChatSocket";
@@ -36,6 +37,10 @@ export default function ChatLayout({ conversations }) {
 
   const addConversation = useConversationsStore(
     (state) => state.addConversation,
+  );
+
+  const removeConversation = useConversationsStore(
+    (state) => state.removeConversation,
   );
 
   const [messages, setMessages] = useState([
@@ -173,6 +178,20 @@ export default function ChatLayout({ conversations }) {
     return { error: null };
   }
 
+  async function handleDeleteConversation(conversationId) {
+    const deleted = await deleteConversation(conversationId);
+
+    if (!deleted) {
+      throw new Error("Conversation could not be deleted");
+    }
+
+    removeConversation(conversationId);
+
+    if (conversationId === activeConversationId) {
+      handleNewConversation();
+    }
+  }
+
   useEffect(() => {
     async function hydrateConversation() {
       if (!activeConversationId) {
@@ -213,6 +232,7 @@ export default function ChatLayout({ conversations }) {
           activeConversationId={activeConversationId}
           onSelectConversation={setActiveConversationId}
           onNewConversation={handleNewConversation}
+          onDeleteConversation={handleDeleteConversation}
         />
 
         <ChatClient

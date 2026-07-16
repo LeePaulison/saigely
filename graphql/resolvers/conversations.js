@@ -3,6 +3,7 @@ import {
   createConversation,
   getUserConversations,
   getConversationById,
+  deleteConversation,
 } from "../../repositories/conversationRepository.js";
 
 export function createConversationResolvers(repository = {
@@ -10,12 +11,14 @@ export function createConversationResolvers(repository = {
   createConversation,
   getUserConversations,
   getConversationById,
+  deleteConversation,
 }) {
   const {
     appendMessages: appendConversationMessages,
     createConversation: createNewConversation,
     getUserConversations: findUserConversations,
     getConversationById: findConversationById,
+    deleteConversation: deleteOwnedConversation,
   } = repository;
 
   return {
@@ -72,6 +75,17 @@ export function createConversationResolvers(repository = {
       return appendConversationMessages({
         conversationId: input.conversationId,
         messages,
+      });
+    },
+
+    deleteConversation: async (_, { id }, context) => {
+      if (!context.authenticated) {
+        throw new Error("Unauthorized");
+      }
+
+      return deleteOwnedConversation({
+        conversationId: id,
+        userId: context.user.id,
       });
     },
   },

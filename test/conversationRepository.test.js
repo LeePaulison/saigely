@@ -65,3 +65,45 @@ test("conversation summaries project the first message as their preview", async 
 
   assert.equal(findOptions.projection.messages.$slice, 1);
 });
+
+test("conversation deletion validates the ID before querying MongoDB", async () => {
+  let databaseRequested = false;
+  const repository = createConversationRepository({
+    getDatabase: async () => {
+      databaseRequested = true;
+      return databaseWithCollection({});
+    },
+  });
+
+  assert.equal(
+    await repository.deleteConversation({
+      conversationId: "invalid",
+      userId: "user-1",
+    }),
+    false,
+  );
+  assert.equal(databaseRequested, false);
+});
+
+test("conversation deletion includes ownership in the atomic filter", async () => {
+  const id = new ObjectId();
+  let filter;
+  const repository = createConversationRepository({
+    getDatabase: async () =>
+      databaseWithCollection({
+        deleteOne: async (value) => {
+          filter = value;
+          return { deletedCount: 1 };
+        },
+      }),
+  });
+
+  const deleted = await repository.deleteConversation({
+    conversationId: id.toString(),
+    userId: "user-1",
+  });
+
+  assert.equal(deleted, true);
+  assert.equal(filter._id.toString(), id.toString());
+  assert.equal(filter.userId, "user-1");
+});
