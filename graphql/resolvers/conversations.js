@@ -5,14 +5,27 @@ import {
   getConversationById,
 } from "../../repositories/conversationRepository.js";
 
-export const conversationResolvers = {
+export function createConversationResolvers(repository = {
+  appendMessages,
+  createConversation,
+  getUserConversations,
+  getConversationById,
+}) {
+  const {
+    appendMessages: appendConversationMessages,
+    createConversation: createNewConversation,
+    getUserConversations: findUserConversations,
+    getConversationById: findConversationById,
+  } = repository;
+
+  return {
   Query: {
     conversations: async (_, __, context) => {
       if (!context.authenticated) {
         return [];
       }
 
-      return getUserConversations(context.user.id);
+      return findUserConversations(context.user.id);
     },
 
     conversation: async (_, { id }, context) => {
@@ -20,7 +33,7 @@ export const conversationResolvers = {
         return null;
       }
 
-      const conversation = await getConversationById(id);
+      const conversation = await findConversationById(id);
 
       if (!conversation) {
         return null;
@@ -47,16 +60,16 @@ export const conversationResolvers = {
       ];
 
       if (!input.conversationId) {
-        return createConversation({ userId: context.user.id, messages });
+        return createNewConversation({ userId: context.user.id, messages });
       }
 
-      const conversation = await getConversationById(input.conversationId);
+      const conversation = await findConversationById(input.conversationId);
 
       if (!conversation || conversation.userId !== context.user.id) {
         throw new Error("Conversation not found");
       }
 
-      return appendMessages({
+      return appendConversationMessages({
         conversationId: input.conversationId,
         messages,
       });
@@ -85,4 +98,7 @@ export const conversationResolvers = {
         ? message.createdAt.toISOString()
         : message.createdAt,
   },
-};
+  };
+}
+
+export const conversationResolvers = createConversationResolvers();

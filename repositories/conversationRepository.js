@@ -1,9 +1,10 @@
 import { ObjectId } from "mongodb";
 
-import { getMongoDatabase } from "@/lib/db/mongo.js";
+import { getMongoDatabase } from "../lib/db/mongo.js";
 
-export async function createConversation({ userId, messages }) {
-  const database = await getMongoDatabase();
+export function createConversationRepository({ getDatabase = getMongoDatabase } = {}) {
+  async function createConversation({ userId, messages }) {
+    const database = await getDatabase();
 
   const conversationsCollection = database.collection("conversations");
 
@@ -18,15 +19,19 @@ export async function createConversation({ userId, messages }) {
     messages,
   });
 
-  return {
-    conversationId: result.insertedId.toString(),
-    preview: messages[0].content,
-    updatedAt: now.toISOString(),
-  };
-}
+    return {
+      conversationId: result.insertedId.toString(),
+      preview: messages[0].content,
+      updatedAt: now.toISOString(),
+    };
+  }
 
-export async function appendMessages({ conversationId, messages }) {
-  const database = await getMongoDatabase();
+  async function appendMessages({ conversationId, messages }) {
+    if (!ObjectId.isValid(conversationId)) {
+      throw new Error("Invalid conversation ID");
+    }
+
+    const database = await getDatabase();
 
   const conversationsCollection = database.collection("conversations");
 
@@ -49,42 +54,61 @@ export async function appendMessages({ conversationId, messages }) {
     },
   );
 
+    return {
+      conversationId,
+      preview: messages[0].content,
+      updatedAt: now.toISOString(),
+    };
+  }
+
+  async function getConversationById(conversationId) {
+    if (!ObjectId.isValid(conversationId)) {
+      return null;
+    }
+
+    const database = await getDatabase();
+
+  const conversationsCollection = database.collection("conversations");
+
+    return conversationsCollection.findOne({
+      _id: new ObjectId(conversationId),
+    });
+  }
+
+  async function getUserConversations(userId) {
+    const database = await getDatabase();
+
+  const conversationsCollection = database.collection("conversations");
+
+    return conversationsCollection
+      .find(
+        { userId },
+        {
+          projection: {
+            updatedAt: 1,
+            messages: {
+              $slice: 1,
+            },
+          },
+        },
+      )
+      .sort({
+        updatedAt: -1,
+      })
+      .toArray();
+  }
+
   return {
-    conversationId,
-    preview: messages[0].content,
-    updatedAt: now.toISOString(),
+    createConversation,
+    appendMessages,
+    getConversationById,
+    getUserConversations,
   };
 }
 
-export async function getConversationById(conversationId) {
-  const database = await getMongoDatabase();
-
-  const conversationsCollection = database.collection("conversations");
-
-  return conversationsCollection.findOne({
-    _id: new ObjectId(conversationId),
-  });
-}
-
-export async function getUserConversations(userId) {
-  const database = await getMongoDatabase();
-
-  const conversationsCollection = database.collection("conversations");
-
-  return conversationsCollection
-    .find(
-      { userId },
-      {
-        projection: {
-          updatedAt: 1,
-          messages: {
-            $slice: -1,
-          },
-        },
-      },
-    )
-    .sort({
-      updatedAt: -1,
-    })
-    .toArray();
-}
+export const {
+  createConversation,
+  appendMessages,
+  getConversationById,
+  getUserConversations,
+} = createConversationRepository();

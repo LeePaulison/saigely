@@ -2,7 +2,7 @@
 
 Saigely is a full-stack AI chat application built with Next.js. It combines OAuth authentication, configurable AI preferences, persistent conversation history, Markdown rendering, file attachments, and token-by-token response streaming.
 
-The Next.js application owns the UI, authentication, GraphQL API, and data access. A separate Node.js WebSocket service handles OpenAI response streaming and calls the application's authenticated GraphQL API to load preferences and persist completed turns.
+The Next.js application owns the UI, authentication, GraphQL API, and data access. The separate [OpenAI WebSocket Gateway](https://github.com/LeePaulison/openai-websocket-gateway) handles OpenAI response streaming and calls the application's authenticated GraphQL API to load preferences and persist completed turns.
 
 Production: [saigely.vercel.app](https://saigely.vercel.app)
 
@@ -29,16 +29,16 @@ Production: [saigely.vercel.app](https://saigely.vercel.app)
 - MongoDB
 - Zustand
 
-### Streaming service
+### OpenAI WebSocket Gateway
 
-The companion `saigely-server` project is a small Node.js service using:
+The separately maintained [OpenAI WebSocket Gateway](https://github.com/LeePaulison/openai-websocket-gateway) is a small Node.js service using:
 
 - `ws` for WebSocket connections
 - `jose` for JWT verification against the app's public JWKS
 - OpenAI Responses API for streamed model output
 - The Saigely GraphQL API for preferences, model/agent configuration, and persistence
 
-The service is currently hosted on Fly.io; the Next.js application is hosted on Vercel.
+The gateway is currently hosted on Fly.io; the Next.js application is hosted on Vercel.
 
 ## Architecture
 
@@ -52,7 +52,7 @@ Browser
   |               |                   models, agents, and levels
   |               `-- MongoDB: conversations and messages
   |
-  `-- WSS ----> Streaming service on Fly.io
+  `-- WSS ----> OpenAI WebSocket Gateway on Fly.io
                   |-- verifies JWT using the Vercel JWKS endpoint
                   |-- streams responses from OpenAI
                   `-- calls Vercel GraphQL with the user's bearer token
@@ -63,7 +63,7 @@ Browser
 1. The user signs in with GitHub or Google through Better Auth.
 2. The browser receives a secure session cookie.
 3. Before opening the chat socket, the browser requests a short-lived JWT from Better Auth.
-4. The streaming service verifies the JWT against `/api/auth/jwks`, including the issuer and audience.
+4. The gateway verifies the JWT against `/api/auth/jwks`, including the issuer and audience.
 5. The same JWT is forwarded to GraphQL when the service reads user configuration or saves a conversation turn.
 
 Default JWT claims expected by both projects:
@@ -111,8 +111,8 @@ providers/       Client-side providers
 - A Neon Postgres database with the Saigely schema and configuration data
 - A MongoDB database
 - GitHub and/or Google OAuth applications
-- The companion `saigely-server` running locally or at a reachable URL
-- An OpenAI API key configured in the companion server
+- The [OpenAI WebSocket Gateway](https://github.com/LeePaulison/openai-websocket-gateway) running locally or at a reachable URL
+- An OpenAI API key configured in the gateway
 
 ### Install and run
 
@@ -156,21 +156,23 @@ http://localhost:3000/api/auth/callback/google
 
 `NEXT_PUBLIC_API_URL` exists for a legacy request helper but is not part of the active chat, authentication, or server-rendered GraphQL path.
 
-### Streaming-service environment
+### Gateway environment
 
-Configure the companion server separately:
+Configure the OpenAI WebSocket Gateway separately:
 
 ```env
 HOST=0.0.0.0
 PORT=8080
 OPENAI_API_KEY=
-NEXTJS_ORIGIN=http://localhost:3000
+API_ORIGIN=http://localhost:3000
+CLIENT_ORIGIN=http://localhost:3000
 CORS_ORIGIN=http://localhost:3000
+JWKS_URL=http://localhost:3000/api/auth/jwks
 JWT_ISSUER=saigely-next
 JWT_AUDIENCE=saigely-websocket
 ```
 
-`NEXTJS_ORIGIN` must be reachable from the streaming service. In a hosted environment it cannot point to `localhost`; it must use the deployed Next.js origin.
+`API_ORIGIN` and `JWKS_URL` must be reachable from the gateway. In a hosted environment they cannot point to `localhost`; they must use the deployed Next.js origin. `CLIENT_ORIGIN` identifies the browser origin allowed to connect.
 
 ## Scripts
 
@@ -186,7 +188,7 @@ JWT_AUDIENCE=saigely-websocket
 The current production topology is:
 
 - Next.js application: Vercel
-- WebSocket/OpenAI service: Fly.io
+- OpenAI WebSocket Gateway: Fly.io
 - Relational database: Neon Postgres
 - Conversation database: MongoDB
 
@@ -198,10 +200,12 @@ NEXT_PUBLIC_AUTH_URL=https://saigely.vercel.app
 NEXT_PUBLIC_WS_SERVER=wss://saigely-server.fly.dev/ws
 ```
 
-The Fly service must use matching authentication settings:
+The Fly-hosted gateway must use matching origins and authentication settings:
 
 ```env
-NEXTJS_ORIGIN=https://saigely.vercel.app
+API_ORIGIN=https://saigely.vercel.app
+CLIENT_ORIGIN=https://saigely.vercel.app
+JWKS_URL=https://saigely.vercel.app/api/auth/jwks
 JWT_ISSUER=saigely-next
 JWT_AUDIENCE=saigely-websocket
 ```
