@@ -3,7 +3,7 @@
 import { Fragment, useLayoutEffect, useRef, useState } from "react";
 import { PaperPlaneIcon, FilePlusIcon } from "@radix-ui/react-icons";
 
-import { usePreferencesSelection } from "@/hooks/usePreferencesSelection";
+import { useChatPreferencesSelection } from "@/hooks/useChatPreferencesSelection";
 import { serializeTextAttachments } from "@/lib/chat/textAttachments";
 
 const MAX_ATTACHMENTS = 3;
@@ -53,7 +53,7 @@ export default function ChatComposer({ onSendMessage, status = "connecting" }) {
     savingSelection,
     saveModelSelection,
     saveAgentSelection,
-  } = usePreferencesSelection();
+  } = useChatPreferencesSelection();
 
   const selectionDisabled = !preferences || savingSelection;
   const statusDisplay = STATUS_DISPLAY[status] ?? STATUS_DISPLAY.connecting;

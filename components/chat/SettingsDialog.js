@@ -1,12 +1,32 @@
 "use client";
 
 import { usePreferencesSelection } from "@/hooks/usePreferencesSelection";
+import { useHeaderPreferences } from "@/hooks/useHeaderPreferences";
 
 import { Dialog } from "radix-ui";
 import { ScrollArea } from "radix-ui";
 import { useTheme } from "next-themes";
 
-export const SettingsDialog = ({ open, onOpenChange }) => {
+export const SettingsDialog = (props) => {
+  const preferenceData = useHeaderPreferences();
+  const { preferences, aiAgents, aiModels } = preferenceData;
+
+  if (!preferences || !aiAgents.length || !aiModels.length) {
+    return null;
+  }
+
+  const draftKey = JSON.stringify(preferences);
+
+  return (
+    <SettingsDialogForm
+      key={draftKey}
+      {...props}
+      preferenceData={preferenceData}
+    />
+  );
+};
+
+const SettingsDialogForm = ({ open, onOpenChange, preferenceData }) => {
   const { theme, setTheme } = useTheme();
 
   const {
@@ -36,7 +56,7 @@ export const SettingsDialog = ({ open, onOpenChange }) => {
     setReasoning,
     setVerbosity,
     setAgent,
-  } = usePreferencesSelection();
+  } = usePreferencesSelection(preferenceData);
 
   const handleSave = async () => {
     await save({

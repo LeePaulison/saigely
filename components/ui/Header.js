@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/auth-client";
 
-import { usePreferencesSelection } from "@/hooks/usePreferencesSelection";
-
 import { UserMenu } from "./UserMenu";
 import { SettingsDialog } from "../chat/SettingsDialog";
 
