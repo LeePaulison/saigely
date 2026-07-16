@@ -88,8 +88,6 @@ export function usePreferencesSelection() {
 
     const { userId, ...rest } = input;
 
-    console.log("Save - input: ", rest);
-
     return savePreferences(rest);
   };
 

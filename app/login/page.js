@@ -4,11 +4,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/auth-client";
 
-import { getPreferences } from "@/graphql/preference/preference";
-
 export default function LoginPage() {
   const { data: session } = authClient.useSession();
-  console.log('Auth Client - session:', session);
   const router = useRouter();
 
   async function handleLogin({ provider }) {
@@ -21,21 +18,9 @@ export default function LoginPage() {
   useEffect(() => {
     if (!session) return;
 
-    (async () => {
-       const currentUser = session.user;
-
-      if (!currentUser) {
-        return;
-      }
-
-      console.log('User Session Generated: ', session)
-
-      const preferences = await getPreferences();
-
-      console.log('User Preferences: ', preferences)
-
+    if (session.user) {
       router.replace("/chat");
-    })();
+    }
   }, [session, router]);
 
   return (

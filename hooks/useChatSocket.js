@@ -195,12 +195,6 @@ export const useChatSocket = ({
             return;
           }
 
-          console.log("WebSocket closed", {
-            code: event.code,
-            reason: event.reason,
-            wasClean: event.wasClean,
-          });
-
           authenticatedRef.current = false;
           websocketRef.current = null;
           setConnected(false);

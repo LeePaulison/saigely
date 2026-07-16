@@ -141,12 +141,12 @@ export const SettingsDialog = ({ open, onOpenChange }) => {
 
                 {supportsReasoning && (
                   <div className="DialogField">
-                    <label className="DialogLabel" htmlFor="model">
+                    <label className="DialogLabel" htmlFor="reasoning">
                       AI Model Reasoning
                     </label>
 
                     <select
-                      id="model"
+                      id="reasoning"
                       className="DialogSelect"
                       value={reasoning}
                       onChange={(event) => setReasoning(event.target.value)}
@@ -165,12 +165,12 @@ export const SettingsDialog = ({ open, onOpenChange }) => {
 
                 {supportsVerbosity && (
                   <div className="DialogField">
-                    <label className="DialogLabel" htmlFor="model">
+                    <label className="DialogLabel" htmlFor="verbosity">
                       AI Model Verbosity
                     </label>
 
                     <select
-                      id="model"
+                      id="verbosity"
                       className="DialogSelect"
                       value={verbosity}
                       onChange={(event) => setVerbosity(event.target.value)}
@@ -193,12 +193,12 @@ export const SettingsDialog = ({ open, onOpenChange }) => {
                 <div className="DialogCardTitle">Agent</div>
 
                 <div className="DialogField">
-                  <label className="DialogLabel" htmlFor="agent">
+                  <label className="DialogLabel" htmlFor="agent-category">
                     Agent Category
                   </label>
 
                   <select
-                    id="agent"
+                    id="agent-category"
                     className="DialogSelect"
                     value={category}
                     onChange={(event) => setCategory(event.target.value)}
@@ -220,10 +220,7 @@ export const SettingsDialog = ({ open, onOpenChange }) => {
                     id="agent"
                     className="DialogSelect"
                     value={agent}
-                    onChange={(event) => {
-                      console.log("Agent: ", event.target.value);
-                      setAgent(event.target.value);
-                    }}
+                    onChange={(event) => setAgent(event.target.value)}
                   >
                     {agents.map((agent) => (
                       <option key={agent.agentId} value={agent.agentId}>
