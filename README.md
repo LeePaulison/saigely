@@ -216,6 +216,10 @@ JWT_AUDIENCE=saigely-websocket
 
 The Vercel JWKS endpoint must be publicly reachable by Fly. Vercel Preview Deployment Protection blocks that request, so the public Production origin is used for the current integration.
 
+## Operations
+
+The [production operations runbook](docs/operations.md) documents deployment order, health and readiness interpretation, smoke tests, logging, incident diagnosis, and rollback across Vercel and Fly.io.
+
 ## Current scope
 
 Saigely is an MVP and portfolio project rather than a production SaaS offering. Its emphasis is a maintainable full-stack architecture, authenticated service boundaries, configurable AI behavior, and a polished streaming chat experience.
