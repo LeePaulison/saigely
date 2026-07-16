@@ -78,9 +78,7 @@ async function handle(request) {
     );
   }
 
-  const headers = new Headers(request.headers);
-  headers.set("x-request-id", requestId);
-  const response = await yoga(new Request(request, { headers }));
+  const response = await yoga.handle(request, { requestId });
   response.headers.set("X-Request-ID", requestId);
   response.headers.set("Cache-Control", "no-store");
   logger.info("GraphQL request completed", {

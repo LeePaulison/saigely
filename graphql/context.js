@@ -48,7 +48,10 @@ export async function createContext(initialContext = {}) {
   const user = session?.user ?? (await getJwtUser(requestHeaders));
 
   return {
-    requestId: requestHeaders.get("x-request-id") || randomUUID(),
+    requestId:
+      initialContext.requestId ||
+      requestHeaders.get("x-request-id") ||
+      randomUUID(),
     authenticated: !!user,
     session: session?.session ?? null,
     user,
