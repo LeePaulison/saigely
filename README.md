@@ -145,6 +145,10 @@ MONGODB_URI=mongodb+srv://...
 
 # Browser-to-streaming-service connection
 NEXT_PUBLIC_WS_SERVER=ws://localhost:8080/ws
+
+# Optional API protection limits (defaults shown)
+GRAPHQL_MAX_BODY_BYTES=1048576
+GRAPHQL_REQUESTS_PER_MINUTE=120
 ```
 
 OAuth callback URLs for local development are:
@@ -215,6 +219,12 @@ The Vercel JWKS endpoint must be publicly reachable by Fly. Vercel Preview Deplo
 ## Current scope
 
 Saigely is an MVP and portfolio project rather than a production SaaS offering. Its emphasis is a maintainable full-stack architecture, authenticated service boundaries, configurable AI behavior, and a polished streaming chat experience.
+
+## Security and observability
+
+Saigely assigns correlation IDs to GraphQL requests, emits structured JSON request logs without prompt or token data, masks GraphQL errors in production, disables production GraphiQL, applies request body and best-effort per-IP rate limits, and returns non-cacheable API responses. Browser responses include a Content Security Policy, clickjacking protection, MIME sniffing protection, a restrictive permissions policy, and a bounded referrer policy.
+
+The application-level GraphQL limiter is process-local and therefore supplemental on serverless infrastructure. Production deployments should also configure rate limiting at the hosting edge for enforcement across all instances.
 
 ## License
 

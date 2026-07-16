@@ -6,7 +6,12 @@ import { getConversation } from "@/graphql/conversation/conversation";
 import { useConversationsStore } from "@/store/stores/conversationsStore";
 import { useChatInitialization } from "@/hooks/useChatInitialization";
 import { useChatSocket } from "@/hooks/useChatSocket";
-import { parseTextAttachmentMessage } from "@/lib/chat/textAttachments";
+import {
+  createChatSocketMessage,
+  getChatPayloadByteLength,
+  MAX_CHAT_PAYLOAD_BYTES,
+  parseTextAttachmentMessage,
+} from "@/lib/chat/textAttachments";
 
 import { Header } from "../ui/Header";
 import { ChatClient } from "./ChatClient";
@@ -91,6 +96,10 @@ export default function ChatLayout({ conversations }) {
         });
       }
     },
+    onChatError: (error) => {
+      setChatStatus("request_error");
+      console.error("Chat request failed", error);
+    },
     onError: (error) => {
       setChatStatus("error");
       console.error("Chat socket failed", error);
@@ -136,17 +145,22 @@ export default function ChatLayout({ conversations }) {
       content: "",
     };
 
-    const sent = send({
-      type: "chat_message",
-      payload: {
-        content,
-        conversationId: activeConversationId,
-      },
+    const socketMessage = createChatSocketMessage({
+      content,
+      conversationId: activeConversationId,
     });
+
+    if (getChatPayloadByteLength(socketMessage) > MAX_CHAT_PAYLOAD_BYTES) {
+      return {
+        error: "The message and attachments exceed the 640 KB transmission limit.",
+      };
+    }
+
+    const sent = send(socketMessage);
 
     if (!sent) {
       setChatStatus("error");
-      return;
+      return { error: "The chat connection is not ready." };
     }
 
     clearTimeout(savedStatusTimerRef.current);
@@ -156,6 +170,7 @@ export default function ChatLayout({ conversations }) {
       userMessage,
       assistantMessage,
     ]);
+    return { error: null };
   }
 
   useEffect(() => {

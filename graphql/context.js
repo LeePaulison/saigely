@@ -1,6 +1,7 @@
 // graphql/context.js
 
 import { headers } from "next/headers";
+import { randomUUID } from "node:crypto";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
 import { auth } from "@/lib/auth";
@@ -38,8 +39,8 @@ async function getJwtUser(requestHeaders) {
   return { id: payload.sub };
 }
 
-export async function createContext() {
-  const requestHeaders = await headers();
+export async function createContext(initialContext = {}) {
+  const requestHeaders = initialContext.request?.headers ?? (await headers());
   const session = await auth.api.getSession({
     headers: requestHeaders,
   });
@@ -47,6 +48,7 @@ export async function createContext() {
   const user = session?.user ?? (await getJwtUser(requestHeaders));
 
   return {
+    requestId: requestHeaders.get("x-request-id") || randomUUID(),
     authenticated: !!user,
     session: session?.session ?? null,
     user,

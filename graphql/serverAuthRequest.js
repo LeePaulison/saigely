@@ -14,6 +14,7 @@ export async function serverAuthRequest({ query, variables = {} }) {
     headers: {
       "Content-Type": "application/json",
       cookie: requestHeaders.get("cookie") ?? "",
+      "X-Request-ID": requestHeaders.get("x-request-id") ?? crypto.randomUUID(),
     },
     cache: "no-store",
     body: JSON.stringify({
@@ -27,8 +28,6 @@ export async function serverAuthRequest({ query, variables = {} }) {
   }
 
   const result = await response.json();
-
-  console.log(result);
 
   if (result.errors) {
     throw new Error(result.errors[0]?.message || "GraphQL request failed");

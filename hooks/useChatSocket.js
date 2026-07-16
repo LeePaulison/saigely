@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { decodeJwt } from "jose";
 
 import { authClient } from "@/lib/auth/auth-client";
+import {
+  getReconnectDelay,
+  shouldReconnect,
+} from "@/lib/chat/reconnect";
 
 const TOKEN_REFRESH_BUFFER_MS = 30_000;
 
@@ -17,22 +21,58 @@ function getTokenExpiration(token) {
   }
 }
 
-export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
+export const useChatSocket = ({
+  onChatChunk,
+  onChatComplete,
+  onChatError,
+  onError,
+}) => {
   const websocketRef = useRef(null);
   const authenticatedRef = useRef(false);
-  const callbacksRef = useRef({ onChatChunk, onChatComplete, onError });
+  const callbacksRef = useRef({
+    onChatChunk,
+    onChatComplete,
+    onChatError,
+    onError,
+  });
+  const requestInFlightRef = useRef(false);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    callbacksRef.current = { onChatChunk, onChatComplete, onError };
-  }, [onChatChunk, onChatComplete, onError]);
+    callbacksRef.current = {
+      onChatChunk,
+      onChatComplete,
+      onChatError,
+      onError,
+    };
+  }, [onChatChunk, onChatComplete, onChatError, onError]);
 
   useEffect(() => {
     let cancelled = false;
     let websocket;
     let refreshTimeout;
+    let reconnectTimeout;
+    let reconnectAttempts = 0;
+
+    function scheduleReconnect(error) {
+      if (cancelled) return;
+
+      const delay = getReconnectDelay(reconnectAttempts);
+      if (delay === null) {
+        callbacksRef.current.onError?.(
+          error || new Error("Unable to reconnect to the chat service"),
+        );
+        return;
+      }
+
+      reconnectAttempts += 1;
+      clearTimeout(reconnectTimeout);
+      reconnectTimeout = setTimeout(connect, delay);
+    }
 
     async function connect() {
+      clearTimeout(reconnectTimeout);
+
       try {
         const { data, error } = await authClient.token();
 
@@ -94,6 +134,7 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
 
           switch (message.type) {
             case "authenticated":
+              reconnectAttempts = 0;
               authenticatedRef.current = true;
               setConnected(true);
 
@@ -112,10 +153,18 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
               break;
 
             case "authentication_error":
+              requestInFlightRef.current = false;
               authenticatedRef.current = false;
               setConnected(false);
               callbacksRef.current.onError?.(
                 new Error(message.payload?.message || "Authentication failed"),
+              );
+              break;
+
+            case "error":
+              requestInFlightRef.current = false;
+              callbacksRef.current.onChatError?.(
+                new Error(message.payload?.message || "Chat request failed"),
               );
               break;
 
@@ -124,6 +173,7 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
               break;
 
             case "chat_complete":
+              requestInFlightRef.current = false;
               callbacksRef.current.onChatComplete?.(message.payload);
               break;
 
@@ -138,7 +188,6 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
           }
 
           console.error("WebSocket error:", error);
-          callbacksRef.current.onError?.(error);
         };
 
         socket.onclose = (event) => {
@@ -160,11 +209,30 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
 
           if (event.code === 4000) {
             connect();
+          } else if (shouldReconnect(event.code)) {
+            if (requestInFlightRef.current) {
+              requestInFlightRef.current = false;
+              callbacksRef.current.onChatError?.(
+                new Error("The chat request was interrupted by a connection loss"),
+              );
+            }
+
+            scheduleReconnect(
+              new Error(
+                event.reason || `WebSocket closed unexpectedly (${event.code})`,
+              ),
+            );
+          } else {
+            callbacksRef.current.onError?.(
+              new Error(
+                event.reason || `WebSocket closed (${event.code})`,
+              ),
+            );
           }
         };
       } catch (error) {
         if (error.name !== "AbortError") {
-          callbacksRef.current.onError?.(error);
+          scheduleReconnect(error);
         }
       }
     }
@@ -174,6 +242,7 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
     return () => {
       cancelled = true;
       clearTimeout(refreshTimeout);
+      clearTimeout(reconnectTimeout);
 
       if (websocket) {
         websocket.onopen = null;
@@ -209,6 +278,11 @@ export const useChatSocket = ({ onChatChunk, onChatComplete, onError }) => {
     }
 
     websocket.send(JSON.stringify(message));
+
+    if (message.type === "chat_message") {
+      requestInFlightRef.current = true;
+    }
+
     return true;
   };
 

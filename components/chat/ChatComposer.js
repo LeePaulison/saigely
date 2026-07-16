@@ -34,6 +34,7 @@ const STATUS_DISPLAY = {
   },
   saved: { label: "Saved", light: "bg-emerald-600" },
   error: { label: "Connection error", light: "bg-red-500" },
+  request_error: { label: "Request failed — ready to retry", light: "bg-red-500" },
 };
 
 export default function ChatComposer({ onSendMessage, status = "connecting" }) {
@@ -90,7 +91,14 @@ export default function ChatComposer({ onSendMessage, status = "connecting" }) {
     const outgoingMessage =
       trimmedMessage || "Please review the attached file content.";
 
-    onSendMessage(serializeTextAttachments(outgoingMessage, attachments));
+    const serializedMessage = serializeTextAttachments(outgoingMessage, attachments);
+
+    const result = onSendMessage(serializedMessage);
+
+    if (result?.error) {
+      setAttachmentError(result.error);
+      return;
+    }
 
     setMessage("");
     setAttachments([]);
