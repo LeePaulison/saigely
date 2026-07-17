@@ -63,7 +63,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <aside className="mt-6 rounded-lg border border-border bg-surface-secondary p-4 text-xs text-muted-foreground">
+        <aside className="mt-6 rounded-lg border border-ring/35 bg-surface p-4 text-xs text-muted-foreground">
           <h2 className="text-sm font-semibold text-foreground">
             What Saigely accesses
           </h2>
