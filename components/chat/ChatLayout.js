@@ -115,6 +115,22 @@ export default function ChatLayout({ conversations }) {
     return () => clearTimeout(savedStatusTimerRef.current);
   }, []);
 
+  useEffect(() => {
+    const activeConversation = storedConversations.find(
+      (conversation) => conversation.id === activeConversationId,
+    );
+    const preview = activeConversation?.preview?.replace(/\s+/g, " ").trim();
+    const label = preview
+      ? `${preview.slice(0, 60)}${preview.length > 60 ? "…" : ""}`
+      : "";
+
+    document.title = label ? `${label} — sAIgely` : "New conversation — sAIgely";
+
+    return () => {
+      document.title = "sAIgely — AI chat";
+    };
+  }, [activeConversationId, storedConversations]);
+
   const composerStatus = connected
     ? chatStatus === "connecting"
       ? "ready"
