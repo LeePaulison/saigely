@@ -1,7 +1,12 @@
 "use client";
 
 import { Fragment, useLayoutEffect, useRef, useState } from "react";
-import { PaperPlaneIcon, FilePlusIcon } from "@radix-ui/react-icons";
+import {
+  FilePlusIcon,
+  InfoCircledIcon,
+  PaperPlaneIcon,
+} from "@radix-ui/react-icons";
+import { Tooltip } from "radix-ui";
 
 import { useChatPreferencesSelection } from "@/hooks/useChatPreferencesSelection";
 import { serializeTextAttachments } from "@/lib/chat/textAttachments";
@@ -193,6 +198,30 @@ export default function ChatComposer({ onSendMessage, status = "connecting" }) {
       className="flex flex-col w-full border-t border-border p-4 pt-2"
     >
       <div className="flex flex-wrap items-center gap-2 pb-2 mb-2 border-b border-border">
+        <Tooltip.Provider>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <button
+                type="button"
+                className="flex items-center rounded-md p-2 text-foreground-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Learn where to change reasoning and verbosity levels"
+              >
+                <InfoCircledIcon aria-hidden="true" />
+              </button>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content
+                className="ChatComposerTooltip"
+                side="bottom"
+                sideOffset={6}
+              >
+                Change reasoning and verbosity levels in Settings.
+                <Tooltip.Arrow className="ChatComposerTooltipArrow" />
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+
         <button
           type="button"
           className="flex items-center rounded-md p-2 text-foreground-muted hover:text-foreground"

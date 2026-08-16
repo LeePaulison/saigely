@@ -1,4 +1,4 @@
-import { asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db/neon.js";
 import { aiModels } from "@/drizzle/aiModels.js";
@@ -27,33 +27,51 @@ export const defaultAiModels = [
     supportsStreaming: true,
   },
   {
-    modelId: "gpt-4.1",
-    name: "GPT-4.1",
+    modelId: "gpt-5.5",
+    name: "GPT-5.5",
     provider: "OpenAI",
     description:
-      "Advanced coding and reasoning model with excellent instruction following.",
-    supportsTemperature: true,
-    supportsReasoning: false,
-    supportsVerbosity: false,
+      "Frontier model for complex professional work, coding, and reasoning.",
+    supportsTemperature: false,
+    supportsReasoning: true,
+    supportsVerbosity: true,
     supportsStreaming: true,
   },
   {
-    modelId: "gpt-4.1-mini",
-    name: "GPT-4.1 Mini",
+    modelId: "gpt-5.6-terra",
+    name: "GPT-5.6 Terra",
     provider: "OpenAI",
-    description: "Balanced model optimized for speed, quality, and lower cost.",
-    supportsTemperature: true,
-    supportsReasoning: false,
-    supportsVerbosity: false,
+    description: "Balanced GPT-5.6 model for strong performance at lower cost.",
+    supportsTemperature: false,
+    supportsReasoning: true,
+    supportsVerbosity: true,
+    supportsStreaming: true,
+  },
+  {
+    modelId: "gpt-5.6-luna",
+    name: "GPT-5.6 Luna",
+    provider: "OpenAI",
+    description: "Cost-efficient GPT-5.6 model for high-volume workloads.",
+    supportsTemperature: false,
+    supportsReasoning: true,
+    supportsVerbosity: true,
     supportsStreaming: true,
   },
 ];
+
+export const DEFAULT_AI_MODEL_ID = "gpt-5.6-luna";
+const allowedAiModelIds = defaultAiModels.map(({ modelId }) => modelId);
 
 export async function getAiModels() {
   return db
     .select()
     .from(aiModels)
-    .where(eq(aiModels.enabled, true))
+    .where(
+      and(
+        eq(aiModels.enabled, true),
+        inArray(aiModels.modelId, allowedAiModelIds),
+      ),
+    )
     .orderBy(asc(aiModels.provider), asc(aiModels.name));
 }
 
@@ -61,7 +79,13 @@ export async function getAiModelById(modelId) {
   const [model] = await db
     .select()
     .from(aiModels)
-    .where(eq(aiModels.modelId, modelId))
+    .where(
+      and(
+        eq(aiModels.enabled, true),
+        eq(aiModels.modelId, modelId),
+        inArray(aiModels.modelId, allowedAiModelIds),
+      ),
+    )
     .limit(1);
 
   return model ?? null;

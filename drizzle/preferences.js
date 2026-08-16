@@ -12,7 +12,7 @@ export const preferences = pgTable("preferences", {
 
   defaultModelId: text("default_model_id")
     .notNull()
-    .default("gpt-4.1-mini"),
+    .default("gpt-5.6-luna"),
 
   temperature: real("temperature")
     .notNull()

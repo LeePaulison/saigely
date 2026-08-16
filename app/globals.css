@@ -199,6 +199,24 @@ body {
   color: var(--color-foreground);
 }
 
+.ChatComposerTooltip {
+  z-index: 60;
+  max-width: 18rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  padding: 0.5rem 0.625rem;
+  color: var(--color-foreground);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+  user-select: none;
+}
+
+.ChatComposerTooltipArrow {
+  fill: var(--color-surface);
+}
+
 .DeleteDialogContent {
   position: fixed;
   top: 50%;

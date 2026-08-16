@@ -4,6 +4,10 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/lib/db/neon";
 import { preferences } from "@/drizzle/preferences";
+import {
+  DEFAULT_AI_MODEL_ID,
+  defaultAiModels,
+} from "@/repositories/aiModelsRepository";
 
 export async function getPreferencesByUserId(userId) {
   const [preference] = await db
@@ -11,18 +15,21 @@ export async function getPreferencesByUserId(userId) {
     .from(preferences)
     .where(eq(preferences.userId, userId));
 
-  if (preference) {
+  if (
+    preference &&
+    defaultAiModels.some(({ modelId }) => modelId === preference.defaultModelId)
+  ) {
     return preference;
   }
 
   return upsertPreferences({
     userId,
-    theme: "dark",
-    defaultModelId: "gpt-4.1-mini",
-    temperature: 0.7,
-    defaultReasoningId: "medium",
-    defaultVerbosityId: "medium",
-    defaultAgentId: "assistant",
+    theme: preference?.theme ?? "dark",
+    defaultModelId: DEFAULT_AI_MODEL_ID,
+    temperature: preference?.temperature ?? 0.7,
+    defaultReasoningId: preference?.defaultReasoningId ?? "medium",
+    defaultVerbosityId: preference?.defaultVerbosityId ?? "medium",
+    defaultAgentId: preference?.defaultAgentId ?? "assistant",
   });
 }
 
