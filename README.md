@@ -220,6 +220,16 @@ The Vercel JWKS endpoint must be publicly reachable by Fly. Vercel Preview Deplo
 
 The [production operations runbook](docs/operations.md) documents deployment order, health and readiness interpretation, smoke tests, logging, incident diagnosis, and rollback across Vercel and Fly.io.
 
+## Documentation
+
+The [full documentation suite](docs/README.md) follows the AspAIre structure:
+
+- `docs/00-Project` — vision, product brief, MVP, foundations, decisions, and roadmap
+- `docs/01-Architecture` — application, authentication, data, frontend, GraphQL, deployment, and gateway architecture
+- `docs/02-Domains` — AI workspace, conversations, preferences, and text attachments
+- `docs/03-Development` — coding, components, contributing, and testing guidance
+- `docs/04-Reference` — environment, database, GraphQL, MongoDB, and service references
+
 ## Current scope
 
 Saigely is an MVP and portfolio project rather than a production SaaS offering. Its emphasis is a maintainable full-stack architecture, authenticated service boundaries, configurable AI behavior, and a polished streaming chat experience.
